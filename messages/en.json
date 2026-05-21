@@ -1,0 +1,182 @@
+{
+  "common": {
+    "donate": "Donate",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "download": "Download",
+    "share": "Share",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "required": "Required field",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back"
+  },
+  "header": {
+    "title": "Shield",
+    "subTitle": "Lviv",
+    "slogan": "Together we cover the sky",
+    "subtitle": "Shared defense. Shared responsibility.",
+    "cta": "Cover your sky",
+    "lang": "UA"
+  },
+  "hero": {
+    "headline": "Together we cover the sky",
+    "buildTogether": "Building the dome together"
+  },
+  "progress": {
+    "covered": "Covered {area} km² of {total} km²",
+    "percent": "{percent}% of the sky protected",
+    "collected": "Raised {amount} of {goal} UAH",
+    "funded": "Funded: {percent}%",
+    "areaProtected": "Area protected: {area} km² of {total} km²",
+    "areaLabel": "Area protected:",
+    "areaUnit": "km²"
+  },
+  "search": {
+    "placeholder": "Search by name or company",
+    "hint": "Enter the name you used when donating",
+    "resultArea": "{area}",
+    "notFound": "Can't find yourself?",
+    "processingHint": "Your donation may still be processing",
+    "donateCta": "Make a donation",
+    "contactCta": "Contact us"
+  },
+  "donateModal": {
+    "title": "Cover your sky",
+    "subtitle": "Every hryvnia is real protection for Lviv region",
+    "nameLabel": "Name to display on the Dome",
+    "namePlaceholder": "Koval Family",
+    "nameHint": "This name will be visible to others on the dome",
+    "anonymousLabel": "Make anonymous",
+    "typeLabel": "Donor type",
+    "types": {
+      "person": "Individual",
+      "family": "Family",
+      "business": "Business",
+      "community": "Community"
+    },
+    "tiersTitle": "Choose an amount",
+    "customLabel": "Custom amount",
+    "customPlaceholder": "Enter amount in UAH",
+    "areaLabel": "{area} m² of sky",
+    "businessTitle": "Business partnership",
+    "tiers": {
+      "t500": "500 UAH",
+      "t1000": "1,000 UAH",
+      "t5000": "5,000 UAH",
+      "partner": "Partner — 1 km²",
+      "partnerPro": "Partner PRO — 5 km²",
+      "partnerSector": "Sector Partner — 10 km²",
+      "partnerDistrict": "District Partner — 50 km²",
+      "partnerCommunity": "Community Partner — 100 km²",
+      "partnerStrategic": "Strategic Partner — from 500 km²"
+    },
+    "termsLabel": "I agree to the offer terms and privacy policy",
+    "submit": "Proceed to payment",
+    "submitting": "Processing...",
+    "errorMinAmount": "Minimum amount is 50 UAH",
+    "errorName": "Enter a name or select 'Anonymous'"
+  },
+  "donationCard": {
+    "title": "Your cell",
+    "areaLabel": "Protected area",
+    "typeLabel": "Donor type",
+    "statusLabel": "Status",
+    "status": {
+      "paid": "Paid ✓",
+      "pending": "Awaiting payment",
+      "cancelled": "Cancelled"
+    },
+    "downloadStories": "Download for Stories",
+    "downloadCert": "Download Certificate",
+    "shareTitle": "Share"
+  },
+  "success": {
+    "title": "Thank you!",
+    "subtitle": "Your contribution protects the sky over Lviv region",
+    "donorArea": "You covered {area} m² of sky",
+    "viewCell": "View your cell on the dome",
+    "shareTitle": "Share with friends",
+    "downloadStories": "Save for Stories",
+    "downloadCert": "Download Certificate"
+  },
+  "og": {
+    "storiesText": "I covered {area} m² of sky over Lviv region",
+    "certTitle": "Participant Certificate",
+    "certText": "Thank you for protecting the sky over Lviv",
+    "certArea": "{area} m² protected",
+    "site": "kupol.lviv.ua"
+  },
+  "footer": {
+    "rights": "© {year} Lviv Shield. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contacts": "Contacts"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Panel",
+      "subtitle": "Administrator login",
+      "loginLabel": "Login",
+      "passwordLabel": "Password",
+      "submit": "Sign In",
+      "error": "Invalid login or password"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "donations": "Donations",
+      "expenses": "Expenses",
+      "settings": "Settings",
+      "logout": "Sign Out"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalCollected": "Total raised",
+      "totalArea": "Coverage area",
+      "totalDonors": "Donors",
+      "totalExpenses": "Total expenses"
+    },
+    "donations": {
+      "title": "Donations",
+      "addManual": "Add manually",
+      "name": "Name",
+      "amount": "Amount (UAH)",
+      "area": "Area (m²)",
+      "type": "Type",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "hide": "Hide",
+      "show": "Show",
+      "manual": "Manual",
+      "online": "Online",
+      "statusPaid": "Paid",
+      "statusPending": "Pending",
+      "statusCancelled": "Cancelled"
+    },
+    "expenses": {
+      "title": "Expenses",
+      "addExpense": "Add expense",
+      "amount": "Amount (UAH)",
+      "description": "Description",
+      "category": "Category",
+      "date": "Date",
+      "categories": {
+        "equipment": "Equipment",
+        "services": "Services",
+        "other": "Other"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "goalLabel": "Fundraising goal (UAH)",
+      "areaLabel": "Total dome area (km²)",
+      "rateLabel": "Rate (UAH per 1 km²)",
+      "save": "Save"
+    }
+  }
+}

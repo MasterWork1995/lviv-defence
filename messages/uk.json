@@ -1,0 +1,182 @@
+{
+  "common": {
+    "donate": "Задонатити",
+    "close": "Закрити",
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "download": "Завантажити",
+    "share": "Поділитись",
+    "loading": "Завантаження...",
+    "error": "Щось пішло не так",
+    "required": "Обов'язкове поле",
+    "confirm": "Підтвердити",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "add": "Додати",
+    "back": "Назад"
+  },
+  "header": {
+    "title": "Купол",
+    "subTitle": "Львівщини",
+    "slogan": "Закриємо небо разом",
+    "subtitle": "Спільний захист. Спільна відповідальність.",
+    "cta": "Закрий своє небо",
+    "lang": "EN"
+  },
+  "hero": {
+    "headline": "Закриємо небо разом",
+    "buildTogether": "Будуємо купол разом"
+  },
+  "progress": {
+    "covered": "Закрито {area} км² з {total} км²",
+    "percent": "{percent}% неба захищено",
+    "collected": "Зібрано {amount} з {goal} грн",
+    "funded": "Профінансовано: {percent}%",
+    "areaProtected": "Площа захищена: {area} км² з {total} км²",
+    "areaLabel": "Площа захищена:",
+    "areaUnit": "км²"
+  },
+  "search": {
+    "placeholder": "Пошук за прізвищем або назвою компанії",
+    "hint": "Вкажіть ім'я, яке ви вказали при донаті",
+    "resultArea": "{area}",
+    "notFound": "Не знайшли себе?",
+    "processingHint": "Можливо, донат ще обробляється",
+    "donateCta": "Зробити донат",
+    "contactCta": "Зв'язатися"
+  },
+  "donateModal": {
+    "title": "Закрий своє небо",
+    "subtitle": "Кожна гривня — це реальний захист Львівщини",
+    "nameLabel": "Ім'я для відображення на Куполі",
+    "namePlaceholder": "Родина Коваль",
+    "nameHint": "Вкажіть ім'я, яке побачать інші на куполі",
+    "anonymousLabel": "Зробити анонімно",
+    "typeLabel": "Тип донора",
+    "types": {
+      "person": "Фізична особа",
+      "family": "Родина",
+      "business": "Бізнес",
+      "community": "Громада"
+    },
+    "tiersTitle": "Оберіть суму",
+    "customLabel": "Довільна сума",
+    "customPlaceholder": "Введіть суму в гривнях",
+    "areaLabel": "{area} м² неба",
+    "businessTitle": "Бізнес-партнерство",
+    "tiers": {
+      "t500": "500 грн",
+      "t1000": "1 000 грн",
+      "t5000": "5 000 грн",
+      "partner": "Партнер — 1 км²",
+      "partnerPro": "Партнер PRO — 5 км²",
+      "partnerSector": "Партнер сектора — 10 км²",
+      "partnerDistrict": "Партнер району — 50 км²",
+      "partnerCommunity": "Партнер громади — 100 км²",
+      "partnerStrategic": "Стратегічний партнер — від 500 км²"
+    },
+    "termsLabel": "Я погоджуюсь з умовами оферти та політикою конфіденційності",
+    "submit": "Перейти до оплати",
+    "submitting": "Обробляємо...",
+    "errorMinAmount": "Мінімальна сума 50 грн",
+    "errorName": "Вкажіть ім'я або оберіть «Анонімно»"
+  },
+  "donationCard": {
+    "title": "Ваша сота",
+    "areaLabel": "Площа захисту",
+    "typeLabel": "Тип донора",
+    "statusLabel": "Статус",
+    "status": {
+      "paid": "Оплачено ✓",
+      "pending": "Очікує оплати",
+      "cancelled": "Скасовано"
+    },
+    "downloadStories": "Завантажити для Stories",
+    "downloadCert": "Завантажити Сертифікат",
+    "shareTitle": "Поділитись"
+  },
+  "success": {
+    "title": "Дякуємо!",
+    "subtitle": "Ваш внесок захищає небо Львівщини",
+    "donorArea": "Ви закрили {area} м² неба",
+    "viewCell": "Подивитись свою соту на куполі",
+    "shareTitle": "Поділіться з друзями",
+    "downloadStories": "Зберегти для Stories",
+    "downloadCert": "Завантажити Сертифікат"
+  },
+  "og": {
+    "storiesText": "Я закрив(ла) {area} м² неба над Львівщиною",
+    "certTitle": "Сертифікат учасника",
+    "certText": "Дякуємо за захист неба Львівщини",
+    "certArea": "{area} м² захищено",
+    "site": "kupol.lviv.ua"
+  },
+  "footer": {
+    "rights": "© {year} Купол Львівщини. Всі права захищені.",
+    "privacy": "Політика конфіденційності",
+    "terms": "Умови оферти",
+    "contacts": "Контакти"
+  },
+  "admin": {
+    "login": {
+      "title": "Адмін-панель",
+      "subtitle": "Вхід для адміністраторів",
+      "loginLabel": "Логін",
+      "passwordLabel": "Пароль",
+      "submit": "Увійти",
+      "error": "Невірний логін або пароль"
+    },
+    "nav": {
+      "dashboard": "Дашборд",
+      "donations": "Донати",
+      "expenses": "Витрати",
+      "settings": "Налаштування",
+      "logout": "Вийти"
+    },
+    "dashboard": {
+      "title": "Дашборд",
+      "totalCollected": "Зібрано",
+      "totalArea": "Площа покриття",
+      "totalDonors": "Донорів",
+      "totalExpenses": "Витрачено"
+    },
+    "donations": {
+      "title": "Донати",
+      "addManual": "Додати вручну",
+      "name": "Ім'я",
+      "amount": "Сума (грн)",
+      "area": "Площа (м²)",
+      "type": "Тип",
+      "status": "Статус",
+      "date": "Дата",
+      "actions": "Дії",
+      "hide": "Приховати",
+      "show": "Показати",
+      "manual": "Ручний",
+      "online": "Онлайн",
+      "statusPaid": "Оплачено",
+      "statusPending": "Очікує",
+      "statusCancelled": "Скасовано"
+    },
+    "expenses": {
+      "title": "Витрати",
+      "addExpense": "Додати витрату",
+      "amount": "Сума (грн)",
+      "description": "Опис",
+      "category": "Категорія",
+      "date": "Дата",
+      "categories": {
+        "equipment": "Обладнання",
+        "services": "Послуги",
+        "other": "Інше"
+      }
+    },
+    "settings": {
+      "title": "Налаштування",
+      "goalLabel": "Ціль збору (грн)",
+      "areaLabel": "Загальна площа купола (км²)",
+      "rateLabel": "Курс (грн за 1 км²)",
+      "save": "Зберегти"
+    }
+  }
+}

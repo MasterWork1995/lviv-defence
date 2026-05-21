@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Design tokens (extracted from reference) ─── */
+@theme {
+  /* Backgrounds */
+  --color-bg:           #04091a;
+  --color-surface:      #071428;
+  --color-surface-2:    #0a1d3a;
+  --color-surface-3:    #0f2548;
+
+  /* Borders */
+  --color-border:       #132d4d;
+  --color-border-dim:   #0c2240;
+
+  /* Primary cyan accent — dome glow, CTA, highlights */
+  --color-primary:      #00c8f0;
+  --color-primary-hover:#00b4d8;
+  --color-primary-dim:  #007a96;
+  --color-primary-glow: rgba(0, 200, 240, 0.12);
+
+  /* Dome specific */
+  --color-dome-line:    #1a65c0;
+  --color-dome-glow:    #38b0f0;
+  --color-dome-select:  #00d4ff;
+  --color-dome-fill:    rgba(0, 212, 255, 0.08);
+
+  /* Text */
+  --color-text:         #ffffff;
+  --color-text-dim:     #8bb4d0;
+  --color-text-muted:   #4a6d8c;
+
+  /* Status */
+  --color-success:      #22c55e;
+  --color-warning:      #eab308;
+  --color-error:        #ef4444;
+
+  /* Logo gold accent */
+  --color-gold:         #f0b429;
+
+  /* Utility aliases for Tailwind class compatibility */
+  --color-background:   #04091a;
+  --color-foreground:   #ffffff;
+
+  /* Fonts */
+  --font-sans: var(--font-exo2);
+  --font-display: var(--font-russo);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Font utilities ─── */
+.font-display {
+  font-family: var(--font-russo), var(--font-exo2), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dim);
+}
+
+/* ─── Glow utilities ─── */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(0, 200, 240, 0.25), 0 0 40px rgba(0, 200, 240, 0.1);
+}
+
+.glow-primary:hover {
+  box-shadow: 0 0 28px rgba(0, 200, 240, 0.4), 0 0 60px rgba(0, 200, 240, 0.15);
+}
+
+.glow-dome {
+  box-shadow: 0 0 15px rgba(56, 176, 240, 0.4), 0 0 30px rgba(56, 176, 240, 0.15);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(0, 200, 240, 0.6);
 }

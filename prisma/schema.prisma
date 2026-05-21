@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Donation {
+  id        String   @id @default(cuid())
+  name      String
+  amount    Int      // сума в копійках
+  squareM2  Float    // розрахована площа м²
+  sector    Int?     // індекс hex-сегмента
+  status    String   @default("pending") // pending | paid | cancelled
+  txId      String?  @unique             // Monobank invoice id
+  isHidden  Boolean  @default(false)     // модерація адміном
+  isManual  Boolean  @default(false)     // вручну через адмінку
+  createdAt DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  amount      Int      // сума в копійках
+  description String
+  category    String   // equipment | services | other
+  createdAt   DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value String
+  // keys used:
+  //   total_goal_kopecks   — ціль збору
+  //   total_area_m2        — загальна площа купола
+  //   collected_kopecks    — кешована сума (оновлюється вебхуком)
+}
