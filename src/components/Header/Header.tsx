@@ -18,7 +18,7 @@ export const Header = () => {
   const t = useTranslations();
 
   return (
-    <header className="sticky top-0 z-50 flex min-h-[120px] flex-shrink-0 items-center gap-4 border-b border-border bg-transparent px-5 py-4 lg:gap-6 lg:px-6">
+    <header className="absolute inset-x-0 top-0 z-50 flex min-h-[120px] flex-shrink-0 items-center gap-4 border-b border-border bg-transparent px-5 py-4 lg:gap-6 lg:px-6">
       <div className="flex flex-shrink-0 flex-col gap-0.5">
         <div className="flex items-center gap-2.5">
           <div className="flex h-14 w-14 items-center justify-center rounded border border-gold/30 bg-surface-2">

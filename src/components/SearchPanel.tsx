@@ -22,7 +22,7 @@ export function SearchPanel() {
   const results =
     query.trim().length > 1
       ? MOCK_DONORS.filter((d) =>
-          d.name.toLowerCase().includes(query.toLowerCase())
+          d.name.toLowerCase().includes(query.toLowerCase()),
         )
       : MOCK_DONORS;
 
@@ -30,8 +30,7 @@ export function SearchPanel() {
     setSelected((prev) => (prev?.id === donor.id ? null : donor));
 
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
-      {/* Search */}
+    <div className="flex h-full flex-col gap-3 bg-transparent p-4">
       <div>
         <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.22em] text-text-dim">
           {t("search.placeholder")}
