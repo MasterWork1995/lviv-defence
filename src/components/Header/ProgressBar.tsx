@@ -42,7 +42,7 @@ export const ProgressBar: FC<ProgressBarProps> = ({ percent, area, total }) => {
           <span className="text-[18px] font-bold uppercase">
             <span className="text-text-muted">{t("progress.areaLabel")} </span>
             <span className="text-primary">
-              {area} {t("progress.areaUnit")} {total} {t("progress.areaUnit")}
+              {area} {t("progress.areaUnit")} / {total} {t("progress.areaUnit")}
             </span>
           </span>
         </div>

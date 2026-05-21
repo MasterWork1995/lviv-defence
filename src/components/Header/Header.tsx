@@ -40,7 +40,7 @@ export const Header = () => {
       </div>
 
       <div className="h-15 w-px flex-shrink-0 bg-border" />
-      <ProgressBar percent={44} area={31.2} total={50} />
+      <ProgressBar percent={62} area={62} total={100} />
       <div className="h-15 w-px flex-shrink-0 bg-border" />
       <LanguageSwitcher />
     </header>
