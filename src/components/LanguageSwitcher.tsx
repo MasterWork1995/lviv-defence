@@ -1,7 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "@/i18n/navigation";
+import { useLocaleSwitch } from "@/components/ClientLocaleProvider";
 
 const LANGS = [
   { code: "uk", label: "UA" },
@@ -9,22 +8,14 @@ const LANGS = [
 ] as const;
 
 export function LanguageSwitcher() {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const switchTo = (code: "uk" | "en") => {
-    if (code === locale) return;
-    localStorage.setItem("preferredLocale", code);
-    router.replace(pathname, { locale: code });
-  };
+  const { locale, switchLocale } = useLocaleSwitch();
 
   return (
     <div className="flex items-center gap-2">
       {LANGS.map(({ code, label }) => (
         <button
           key={code}
-          onClick={() => switchTo(code)}
+          onClick={() => switchLocale(code)}
           className={`cursor-pointer rounded border px-3 py-1 text-[15px] font-semibold uppercase tracking-wider transition-all duration-150 ${
             locale === code
               ? "border-primary bg-primary/20 text-primary"

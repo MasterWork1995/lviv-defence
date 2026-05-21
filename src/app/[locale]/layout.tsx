@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Exo_2, Russo_One } from "next/font/google";
-import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { LocaleInit } from "@/components/LocaleInit";
+import { ClientLocaleProvider } from "@/components/ClientLocaleProvider";
 import "../globals.css";
 
 const exo2 = Exo_2({
@@ -44,15 +43,21 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = await getMessages();
+  // Load both locales once on the server — client switches between them instantly (no navigation)
+  const [ukMessages, enMessages] = await Promise.all([
+    import("../../../messages/uk.json").then((m) => m.default),
+    import("../../../messages/en.json").then((m) => m.default),
+  ]);
 
   return (
     <html lang={locale} className={`${exo2.variable} ${russoOne.variable}`}>
       <body className="min-h-screen bg-bg text-text antialiased">
-        <NextIntlClientProvider messages={messages}>
-          <LocaleInit />
+        <ClientLocaleProvider
+          initialLocale={locale as "uk" | "en"}
+          allMessages={{ uk: ukMessages, en: enMessages }}
+        >
           {children}
-        </NextIntlClientProvider>
+        </ClientLocaleProvider>
       </body>
     </html>
   );
