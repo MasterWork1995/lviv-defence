@@ -25,7 +25,9 @@
   },
   "hero": {
     "headline": "Together we cover the sky",
-    "buildTogether": "Building the dome together"
+    "buildTogether": "Building the dome together",
+    "badgeTitle": "Technology of the future",
+    "badgeSubtitle": "for security today"
   },
   "progress": {
     "covered": "Covered {area} km² of {total} km²",

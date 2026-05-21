@@ -49,14 +49,33 @@ export const Hero = () => {
               <DomePlaceholder />
             </div>
           </div>
-          <div className="absolute bottom-3 left-5">
-            <p className="text-[9px] text-text-muted">
-              {t("footer.rights", { year: 2025 })}
-              <span className="mx-1.5 opacity-40">·</span>
-              <button className="cursor-pointer opacity-60 transition-opacity hover:opacity-100 hover:text-text-dim">
-                {t("footer.privacy")}
-              </button>
-            </p>
+          <div className="absolute bottom-5 left-5">
+            <div className="flex items-center gap-3 px-3 py-2.5 backdrop-blur-sm">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/60">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                  />
+                </svg>
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-[16px] font-bold text-text">
+                  {t("hero.badgeTitle")}
+                </span>
+                <span className="text-[14px] text-text-muted">
+                  {t("hero.badgeSubtitle")}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex-shrink-0 border-l border-border bg-transparent mt-[120px] lg:w-72">

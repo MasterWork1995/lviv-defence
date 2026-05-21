@@ -25,7 +25,9 @@
   },
   "hero": {
     "headline": "Закриємо небо разом",
-    "buildTogether": "Будуємо купол разом"
+    "buildTogether": "Будуємо купол разом",
+    "badgeTitle": "Технології майбутнього",
+    "badgeSubtitle": "для безпеки сьогодення"
   },
   "progress": {
     "covered": "Закрито {area} км² з {total} км²",
