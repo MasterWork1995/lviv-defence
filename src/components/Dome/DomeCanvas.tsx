@@ -38,13 +38,15 @@ export default function DomeCanvas() {
   if (!webgl) return null;
 
   return (
-    <div className="h-full w-full cursor-grab active:cursor-grabbing">
+    <div className="h-full w-full">
       <Canvas
-        camera={{ position: [0, 0.8, 2.6], fov: 60, near: 0.1, far: 100 }}
+        camera={{ position: [0, 0.25, 3.1], fov: 68, near: 0.1, far: 100 }}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-        onCreated={({ gl }) => {
+        onCreated={({ camera, gl }) => {
+          // Look up at the dome center — creates the arch effect
+          camera.lookAt(0, 0.9, 0);
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.15;
+          gl.toneMappingExposure = 1.2;
         }}
         style={{ background: "transparent" }}
       >

@@ -3,90 +3,75 @@ import { useTranslations } from "next-intl";
 import { DomeCanvas } from "@/components/Dome/DomeDynamic";
 import { SearchPanel } from "@/components/SearchPanel";
 
+const VIGNETTE =
+  "linear-gradient(to bottom, rgba(4,9,26,0.75) 0%, rgba(4,9,26,0.22) 38%, rgba(4,9,26,0.48) 68%, rgba(4,9,26,0.92) 100%)";
+const RADIAL =
+  "radial-gradient(ellipse 75% 60% at 38% 65%, rgba(26,101,192,0.20) 0%, transparent 70%)";
+
 export const Hero = () => {
   const t = useTranslations();
 
   return (
-    <section className="relative h-screen overflow-hidden">
-      <Image
-        src="/Lviv.jpeg"
-        alt="Нічний Львів"
-        fill
-        priority
-        className="object-cover object-center"
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(4,9,26,0.72) 0%, rgba(4,9,26,0.35) 40%, rgba(4,9,26,0.55) 70%, rgba(4,9,26,0.92) 100%)",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 65% 50% at 50% 60%, rgba(26,101,192,0.22) 0%, transparent 70%)",
-        }}
-      />
+    // h-full fills the CSS grid's 1fr row — no hardcoded pixel offsets
+    <section className="relative h-full overflow-hidden">
 
-      <div className="relative flex h-full flex-col lg:flex-row">
-        {/* Left / Top: headline + dome (desktop) */}
-        <div className="relative flex flex-col lg:flex-1">
-          {/* Dome — fills entire left panel behind headline, desktop only */}
-          <div className="absolute inset-0 hidden lg:block">
-            <DomeCanvas />
-          </div>
-
-          <div className="relative z-10 px-4 pb-3 pt-40 lg:px-8 lg:pb-0 lg:pt-[140px]">
-            <div className="mb-2 flex items-center gap-3">
-              <div className="h-px w-8 bg-dome-line opacity-70" />
-              <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-dome-select opacity-75">
-                {t("hero.buildTogether")}
-              </span>
-              <div className="h-px w-14 bg-dome-line opacity-45" />
-            </div>
-            <h1 className="text-glow text-xl font-bold uppercase tracking-wide text-text lg:text-2xl">
-              {t("hero.headline")}
-            </h1>
-          </div>
-
-          {/* Badge — desktop only */}
-          <div className="absolute bottom-5 left-5 z-10 hidden lg:block">
-            <div className="flex items-center gap-3 px-3 py-2.5 backdrop-blur-sm">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/60">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                  />
-                </svg>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-[16px] font-bold text-text">
-                  {t("hero.badgeTitle")}
-                </span>
-                <span className="text-[14px] text-text-muted">
-                  {t("hero.badgeSubtitle")}
-                </span>
-              </div>
-            </div>
-          </div>
+      {/* ══════════════════════════════════════
+          MOBILE  (flex-col, stacked)
+          ══════════════════════════════════════ */}
+      <div className="absolute inset-0 flex flex-col lg:hidden">
+        {/* Dome strip — background photo only here */}
+        <div className="relative overflow-hidden" style={{ flex: "0 0 42%" }}>
+          <Image src="/Lviv.jpeg" alt="Нічний Львів" fill priority className="object-cover object-center" />
+          <div className="pointer-events-none absolute inset-0" style={{ background: VIGNETTE }} />
+          <div className="pointer-events-none absolute inset-0" style={{ background: RADIAL }} />
+          <DomeCanvas />
         </div>
 
-        {/* Right / Bottom: SearchPanel */}
-        <div className="flex min-h-0 flex-1 flex-col border-t border-border lg:mt-[120px] lg:flex-none lg:flex-shrink-0 lg:border-l lg:border-t-0 lg:w-72">
+        {/* Search panel — solid dark, no photo bleed */}
+        <div className="flex min-h-0 flex-1 flex-col bg-bg">
           <SearchPanel />
         </div>
       </div>
+
+      {/* ══════════════════════════════════════
+          DESKTOP  (flex-row, side-by-side)
+          ══════════════════════════════════════ */}
+      <div className="absolute inset-0 hidden lg:flex">
+        {/* Full-section background */}
+        <Image src="/Lviv.jpeg" alt="Нічний Львів" fill priority className="object-cover object-center" />
+        <div className="pointer-events-none absolute inset-0" style={{ background: VIGNETTE }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: RADIAL }} />
+
+        {/* Left: dome fills the panel */}
+        <div className="relative flex-1">
+          <div className="absolute inset-0">
+            <DomeCanvas />
+          </div>
+
+          {/* Bottom-left badge */}
+          <div className="absolute bottom-5 left-5 z-10">
+            <div className="flex items-center gap-3 rounded border border-border/40 bg-surface/50 px-3 py-2.5 backdrop-blur-sm">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/70">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 text-primary" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-[13px] font-bold text-text">{t("hero.badgeTitle")}</span>
+                <span className="text-[11px] text-text-muted">{t("hero.badgeSubtitle")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: search panel — no mt offset, header is now in grid flow */}
+        <div className="relative z-10 flex w-[320px] flex-shrink-0 flex-col border-l border-border/60 bg-surface/75 backdrop-blur-xl">
+          {/* Top cyan accent line */}
+          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+          <SearchPanel />
+        </div>
+      </div>
+
     </section>
   );
 };

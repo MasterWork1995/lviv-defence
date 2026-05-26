@@ -16,17 +16,19 @@ export interface DonorData {
 
 const DEG = Math.PI / 180;
 
-// (degrees from Y-pole, cell count per ring)
+// 5 rings: 1 + 6 + 11 + 13 + 13 = 44 cells — larger, fewer, more visible
 const RINGS = [
   { thetaDeg: 0,  count: 1  },
   { thetaDeg: 18, count: 6  },
-  { thetaDeg: 34, count: 12 },
-  { thetaDeg: 48, count: 18 },
-  { thetaDeg: 61, count: 24 },
-  { thetaDeg: 74, count: 28 },
+  { thetaDeg: 36, count: 11 },
+  { thetaDeg: 52, count: 13 },
+  { thetaDeg: 68, count: 13 },
 ] as const;
 
-export const TOTAL_CELLS = RINGS.reduce((s, r) => s + r.count, 0); // 89
+export const TOTAL_CELLS = RINGS.reduce((s, r) => s + r.count, 0); // 44
+export const DOME_RADIUS = 1.6;
+export const HEX_OUTER   = 0.235; // border hex circumradius
+export const HEX_INNER   = 0.185; // fill hex circumradius (creates visible border gap)
 
 export function generateDomeCells(radius: number): DomeCell[] {
   const cells: DomeCell[] = [];
@@ -34,7 +36,6 @@ export function generateDomeCells(radius: number): DomeCell[] {
 
   RINGS.forEach(({ thetaDeg, count }, ringIndex) => {
     const theta = thetaDeg * DEG;
-    // Odd rings rotated half-step for better cell packing
     const phiOffset = ringIndex % 2 === 1 ? Math.PI / Math.max(count, 1) : 0;
 
     for (let j = 0; j < count; j++) {
@@ -57,7 +58,7 @@ export function generateDomeCells(radius: number): DomeCell[] {
 export function buildHexShape(circumradius: number): THREE.Shape {
   const shape = new THREE.Shape();
   for (let i = 0; i < 6; i++) {
-    const angle = (i / 6) * Math.PI * 2 + Math.PI / 6; // flat-top orientation
+    const angle = (i / 6) * Math.PI * 2 + Math.PI / 6; // flat-top
     const x = Math.cos(angle) * circumradius;
     const y = Math.sin(angle) * circumradius;
     if (i === 0) shape.moveTo(x, y);
