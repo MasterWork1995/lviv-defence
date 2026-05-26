@@ -52,6 +52,8 @@ export const Header = async () => {
             percent: settings.progressPercent,
             area: Math.round(settings.collectedAreaM2 / 1_000_000),
             total: Math.round(settings.totalAreaM2 / 1_000_000),
+            collectedUah: settings.collectedUah,
+            goalUah: settings.goalUah,
           }}
         />
       </div>

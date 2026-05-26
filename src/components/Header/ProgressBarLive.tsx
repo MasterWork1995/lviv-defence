@@ -8,6 +8,8 @@ interface ProgressData {
   percent: number;
   area: number;
   total: number;
+  collectedUah: number;
+  goalUah: number;
 }
 
 const POLL_INTERVAL = 30_000;
@@ -16,11 +18,15 @@ function toProgressData(json: {
   progressPercent: number;
   collectedAreaM2: number;
   totalAreaM2: number;
+  collectedUah: number;
+  goalUah: number;
 }): ProgressData {
   return {
     percent: json.progressPercent,
     area: Math.round(json.collectedAreaM2 / 1_000_000),
     total: Math.round(json.totalAreaM2 / 1_000_000),
+    collectedUah: json.collectedUah,
+    goalUah: json.goalUah,
   };
 }
 
@@ -37,5 +43,13 @@ export function ProgressBarLive({ initial }: { initial: ProgressData }) {
     return () => clearInterval(id);
   }, []);
 
-  return <ProgressBar percent={data.percent} area={data.area} total={data.total} />;
+  return (
+    <ProgressBar
+      percent={data.percent}
+      area={data.area}
+      total={data.total}
+      collectedUah={data.collectedUah}
+      goalUah={data.goalUah}
+    />
+  );
 }

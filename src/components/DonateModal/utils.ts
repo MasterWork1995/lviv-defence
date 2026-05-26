@@ -1,9 +1,9 @@
 import type { useTranslations } from "next-intl";
+import { formatUah } from "@/lib/format";
 
 type Translate = ReturnType<typeof useTranslations>;
 
-export const formatUah = (amount: number, locale: string): string =>
-  new Intl.NumberFormat(locale === "uk" ? "uk-UA" : "en-US").format(amount);
+export { formatUah };
 
 export const formatArea = (m2: number, t: Translate): string => {
   if (m2 === 0) return "";

@@ -33,7 +33,7 @@
     "covered": "Закрито {area} км² з {total} км²",
     "percent": "{percent}% неба захищено",
     "collected": "Зібрано {amount} з {goal} грн",
-    "funded": "Профінансовано: {percent}%",
+    "fundedLabel": "Профінансовано:",
     "areaProtected": "Площа захищена: {area} км² з {total} км²",
     "areaLabel": "Площа захищена:",
     "areaUnit": "км²"

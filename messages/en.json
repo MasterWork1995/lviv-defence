@@ -33,7 +33,7 @@
     "covered": "Covered {area} km² of {total} km²",
     "percent": "{percent}% of the sky protected",
     "collected": "Raised {amount} of {goal} UAH",
-    "funded": "Funded: {percent}%",
+    "fundedLabel": "Funded:",
     "areaProtected": "Area protected: {area} km² of {total} km²",
     "areaLabel": "Area protected:",
     "areaUnit": "km²"

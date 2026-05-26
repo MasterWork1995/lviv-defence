@@ -1,14 +1,24 @@
 import { FC } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatUah } from "@/lib/format";
 
 interface ProgressBarProps {
   percent: number;
   area: number;
   total: number;
+  collectedUah: number;
+  goalUah: number;
 }
 
-export const ProgressBar: FC<ProgressBarProps> = ({ percent, area, total }) => {
+export const ProgressBar: FC<ProgressBarProps> = ({
+  percent,
+  area,
+  total,
+  collectedUah,
+  goalUah,
+}) => {
   const t = useTranslations();
+  const locale = useLocale();
 
   return (
     <div className="flex w-full flex-col gap-1.5">
@@ -35,8 +45,11 @@ export const ProgressBar: FC<ProgressBarProps> = ({ percent, area, total }) => {
         </span>
       </div>
       <div className="flex flex-col gap-0.5 lg:flex-row lg:items-center lg:justify-between lg:gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary lg:text-[18px]">
-          {t("progress.funded", { percent })}
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] lg:text-[18px]">
+          <span className="text-text-muted">{t("progress.fundedLabel")} </span>
+          <span className="text-primary">
+            {formatUah(collectedUah, locale)} ₴ / {formatUah(goalUah, locale)} ₴
+          </span>
         </span>
         <span className="text-[10px] font-bold uppercase lg:text-[18px]">
           <span className="text-text-muted">{t("progress.areaLabel")} </span>
