@@ -4,7 +4,7 @@ import { dbError } from "@/lib/api-error";
 
 export const revalidate = 30;
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 10;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
   const where = {
     status: "paid",
     isHidden: false,
-    ...(search ? { name: { contains: search, mode: "insensitive" as const } } : {}),
+    ...(search
+      ? { name: { contains: search, mode: "insensitive" as const } }
+      : {}),
   };
 
   let donations, total;
@@ -25,7 +27,14 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
-        select: { id: true, name: true, amount: true, squareM2: true, sector: true, createdAt: true },
+        select: {
+          id: true,
+          name: true,
+          amount: true,
+          squareM2: true,
+          sector: true,
+          createdAt: true,
+        },
       }),
       prisma.donation.count({ where }),
     ]);
