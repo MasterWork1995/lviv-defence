@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { DomePlaceholder } from "@/components/DomePlaceholder";
+import { DomeCanvas } from "@/components/Dome/DomeDynamic";
 import { SearchPanel } from "@/components/SearchPanel";
 
 export const Hero = () => {
@@ -33,7 +33,12 @@ export const Hero = () => {
       <div className="relative flex h-full flex-col lg:flex-row">
         {/* Left / Top: headline + dome (desktop) */}
         <div className="relative flex flex-col lg:flex-1">
-          <div className="px-4 pb-3 pt-40 lg:px-8 lg:pb-0 lg:pt-[140px]">
+          {/* Dome — fills entire left panel behind headline, desktop only */}
+          <div className="absolute inset-0 hidden lg:block">
+            <DomeCanvas />
+          </div>
+
+          <div className="relative z-10 px-4 pb-3 pt-40 lg:px-8 lg:pb-0 lg:pt-[140px]">
             <div className="mb-2 flex items-center gap-3">
               <div className="h-px w-8 bg-dome-line opacity-70" />
               <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-dome-select opacity-75">
@@ -46,15 +51,8 @@ export const Hero = () => {
             </h1>
           </div>
 
-          {/* Dome — desktop only */}
-          <div className="hidden flex-1 items-end justify-center pb-10 lg:flex">
-            <div className="h-full w-full max-w-3xl px-4 pt-10">
-              <DomePlaceholder />
-            </div>
-          </div>
-
           {/* Badge — desktop only */}
-          <div className="absolute bottom-5 left-5 hidden lg:block">
+          <div className="absolute bottom-5 left-5 z-10 hidden lg:block">
             <div className="flex items-center gap-3 px-3 py-2.5 backdrop-blur-sm">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/60">
                 <svg
