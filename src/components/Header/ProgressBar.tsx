@@ -55,27 +55,17 @@ export const ProgressBar: FC<ProgressBarProps> = ({
 
       {/* ── Progress bar + big percent ── */}
       <div className="flex items-center gap-3 lg:gap-4">
-        <div className="relative h-3 flex-1 overflow-hidden rounded-full border border-primary/40 bg-surface-3/80 lg:h-[18px]">
+        <div className="progress-bar-track">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${percent}%`,
-              background:
-                "linear-gradient(90deg, var(--color-dome-line) 0%, var(--color-primary) 55%, var(--color-dome-select) 100%)",
-              boxShadow:
-                "0 0 16px rgba(0, 200, 240, 0.55), inset 0 0 6px rgba(255,255,255,0.25)",
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-0 rounded-full opacity-50"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
-              backgroundSize: "40% 100%",
-              backgroundRepeat: "no-repeat",
-              animation: "progress-shimmer 3s linear infinite",
-            }}
-          />
+            className="progress-bar-fill-wrap"
+            style={{ width: `${percent}%` }}
+          >
+            <div className="progress-bar-fill" />
+            {percent > 2 && (
+              <div className="progress-bar-fill-cap" aria-hidden="true" />
+            )}
+          </div>
+          <div className="progress-shimmer-band" aria-hidden="true" />
         </div>
         <span className="text-glow flex-shrink-0 font-display text-[14px] font-bold tabular-nums text-primary lg:text-[24px]">
           {percent}%
@@ -90,14 +80,10 @@ export const ProgressBar: FC<ProgressBarProps> = ({
             {formatUah(collectedUah, locale)} ₴ / {formatUah(goalUah, locale)} ₴
           </span>
         </span>
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap text-primary">
           <span className="text-text-muted">{t("progress.areaLabel")}</span>{" "}
           <span className="font-semibold text-primary">
-            {area} {t("progress.areaUnit")}
-          </span>
-          <span className="text-text-muted"> / </span>
-          <span className="text-text-dim">
-            {total} {t("progress.areaUnit")}
+            {area} {t("progress.areaUnit")} / {total} {t("progress.areaUnit")}
           </span>
         </span>
       </div>

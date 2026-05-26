@@ -47,8 +47,15 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${exo2.variable} ${russoOne.variable}`}>
-      <body className="min-h-screen bg-bg text-text antialiased">
+    <html
+      lang={locale}
+      className={`${exo2.variable} ${russoOne.variable}`}
+      suppressHydrationWarning
+    >
+      <body
+        className="min-h-screen bg-bg text-text antialiased"
+        suppressHydrationWarning
+      >
         <NextIntlClientProvider messages={messages}>
           <LocaleInit />
           {children}
