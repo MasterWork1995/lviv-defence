@@ -47,6 +47,14 @@
     "donateCta": "Make a donation",
     "contactCta": "Contact us"
   },
+  "errors": {
+    "network": "Network error. Check your connection and try again.",
+    "tooManyRequests": "Too many attempts. Try again in {minutes} min.",
+    "validation": "Please check the entered data.",
+    "server": "Server temporarily unavailable. Please try again later.",
+    "loadFailed": "Failed to load",
+    "retry": "Try again"
+  },
   "donateModal": {
     "title": "Cover your sky",
     "subtitle": "Every hryvnia is real protection for Lviv region",
@@ -64,7 +72,7 @@
     "tiersTitle": "Choose an amount",
     "customLabel": "Custom amount",
     "customPlaceholder": "Enter amount in UAH",
-    "areaLabel": "{area} m² of sky",
+    "areaLabel": "{area} of sky",
     "businessTitle": "Business partnership",
     "tiers": {
       "t500": "500 UAH",
@@ -80,7 +88,7 @@
     "termsLabel": "I agree to the offer terms and privacy policy",
     "submit": "Proceed to payment",
     "submitting": "Processing...",
-    "errorMinAmount": "Minimum amount is 50 UAH",
+    "errorMinAmount": "Minimum amount is 1 ₴",
     "errorName": "Enter a name or select 'Anonymous'"
   },
   "donationCard": {

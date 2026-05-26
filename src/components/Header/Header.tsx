@@ -1,6 +1,7 @@
 import { LanguageSwitcher } from "../LanguageSwitcher";
-import { useTranslations } from "next-intl";
-import { ProgressBar } from "./ProgressBar";
+import { getTranslations } from "next-intl/server";
+import { ProgressBarLive } from "./ProgressBarLive";
+import { getSettings } from "@/lib/data";
 
 function ShieldIcon() {
   return (
@@ -14,8 +15,8 @@ function ShieldIcon() {
   );
 }
 
-export const Header = () => {
-  const t = useTranslations();
+export const Header = async () => {
+  const [t, settings] = await Promise.all([getTranslations(), getSettings()]);
 
   return (
     <header className="absolute inset-x-0 top-0 z-50 flex min-h-[120px] flex-shrink-0 items-center gap-4 border-b border-border bg-transparent px-5 py-4 lg:gap-6 lg:px-6">
@@ -40,7 +41,13 @@ export const Header = () => {
       </div>
 
       <div className="h-15 w-px flex-shrink-0 bg-border" />
-      <ProgressBar percent={62} area={62} total={100} />
+      <ProgressBarLive
+        initial={{
+          percent: settings.progressPercent,
+          area: Math.round(settings.collectedAreaM2 / 1_000_000),
+          total: Math.round(settings.totalAreaM2 / 1_000_000),
+        }}
+      />
       <div className="h-15 w-px flex-shrink-0 bg-border" />
       <LanguageSwitcher />
     </header>
