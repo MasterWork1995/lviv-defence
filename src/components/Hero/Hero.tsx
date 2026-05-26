@@ -4,9 +4,9 @@ import { DomeCanvas } from "@/components/Dome/DomeDynamic";
 import { SearchPanel } from "@/components/SearchPanel";
 
 const VIGNETTE =
-  "linear-gradient(to bottom, rgba(4,9,26,0.75) 0%, rgba(4,9,26,0.22) 38%, rgba(4,9,26,0.48) 68%, rgba(4,9,26,0.92) 100%)";
+  "linear-gradient(to bottom, rgba(4,9,26,0.92) 0%, rgba(4,9,26,0.55) 28%, rgba(4,9,26,0.72) 65%, rgba(4,9,26,0.95) 100%)";
 const RADIAL =
-  "radial-gradient(ellipse 75% 60% at 38% 65%, rgba(26,101,192,0.20) 0%, transparent 70%)";
+  "radial-gradient(ellipse 70% 55% at 38% 60%, rgba(0,200,240,0.15) 0%, transparent 70%)";
 
 export const Hero = () => {
   const t = useTranslations();
@@ -102,8 +102,8 @@ export const Hero = () => {
           </div>
         </div>
 
-        {/* Right: search panel — no mt offset, header is now in grid flow */}
-        <div className="relative z-10 flex w-[320px] flex-shrink-0 flex-col border-l border-border/60 bg-surface/75 backdrop-blur-xl">
+        {/* Right: search panel — wider for the new card-based layout */}
+        <div className="relative z-10 flex w-[400px] flex-shrink-0 flex-col border-l border-primary/15 bg-bg/55 backdrop-blur-xl">
           {/* Top cyan accent line */}
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
           <SearchPanel />

@@ -106,3 +106,13 @@ body {
 .text-glow {
   text-shadow: 0 0 20px rgba(0, 200, 240, 0.6);
 }
+
+/* ─── Progress bar shimmer keyframes ─── */
+@keyframes progress-shimmer {
+  from {
+    background-position: -40% 0;
+  }
+  to {
+    background-position: 140% 0;
+  }
+}
