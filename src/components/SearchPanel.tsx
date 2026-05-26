@@ -108,7 +108,7 @@ export function SearchPanel() {
     <>
       <DonateModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      <div className="flex h-full flex-col gap-3 bg-transparent p-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 bg-transparent p-4">
         <div>
           <p className="mb-2 text-[9px] font-semibold uppercase tracking-[0.22em] text-text-dim">
             {t("search.placeholder")}

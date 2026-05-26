@@ -11,41 +11,39 @@ export const ProgressBar: FC<ProgressBarProps> = ({ percent, area, total }) => {
   const t = useTranslations();
 
   return (
-    <div className="w-full flex justify-center items-center">
-      <div className="flex min-w-0 mx-20 flex-1 flex-col gap-1.5">
-        <div className="flex items-center gap-3">
-          <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-primary/40 to-primary/70" />
-          <p className="font-display flex-shrink-0 text-5 font-semibold uppercase tracking-[0.3em] text-text">
-            {t("hero.buildTogether")}
-          </p>
-          <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-primary/40 to-primary/70" />
+    <div className="flex w-full flex-col gap-1.5">
+      <div className="flex items-center gap-2">
+        <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-primary/40 to-primary/70" />
+        <p className="flex-shrink-0 font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-text lg:text-[18px]">
+          {t("hero.buildTogether")}
+        </p>
+        <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-primary/40 to-primary/70" />
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-surface-3 lg:h-4">
+          <div
+            className="glow-dome h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${percent}%`,
+              background:
+                "linear-gradient(90deg, var(--color-dome-line), var(--color-dome-select))",
+            }}
+          />
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative h-4 flex-1 overflow-hidden rounded-full bg-surface-3">
-            <div
-              className="glow-dome h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${percent}%`,
-                background:
-                  "linear-gradient(90deg, var(--color-dome-line), var(--color-dome-select))",
-              }}
-            />
-          </div>
-          <span className="text-glow font-display flex-shrink-0 text-[16px] font-bold tabular-nums text-primary">
-            {percent}%
+        <span className="text-glow flex-shrink-0 font-display text-[12px] font-bold tabular-nums text-primary lg:text-[16px]">
+          {percent}%
+        </span>
+      </div>
+      <div className="flex flex-col gap-0.5 lg:flex-row lg:items-center lg:justify-between lg:gap-2">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary lg:text-[18px]">
+          {t("progress.funded", { percent })}
+        </span>
+        <span className="text-[10px] font-bold uppercase lg:text-[18px]">
+          <span className="text-text-muted">{t("progress.areaLabel")} </span>
+          <span className="text-primary">
+            {area} {t("progress.areaUnit")} / {total} {t("progress.areaUnit")}
           </span>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[18px] font-bold uppercase tracking-[0.15em] text-primary">
-            {t("progress.funded", { percent })}
-          </span>
-          <span className="text-[18px] font-bold uppercase">
-            <span className="text-text-muted">{t("progress.areaLabel")} </span>
-            <span className="text-primary">
-              {area} {t("progress.areaUnit")} / {total} {t("progress.areaUnit")}
-            </span>
-          </span>
-        </div>
+        </span>
       </div>
     </div>
   );

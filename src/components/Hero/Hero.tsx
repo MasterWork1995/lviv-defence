@@ -7,7 +7,7 @@ export const Hero = () => {
   const t = useTranslations();
 
   return (
-    <section className="relative h-screen">
+    <section className="relative h-screen overflow-hidden">
       <Image
         src="/Lviv.jpeg"
         alt="Нічний Львів"
@@ -30,9 +30,10 @@ export const Hero = () => {
         }}
       />
 
-      <div className="absolute inset-0 flex">
-        <div className="relative flex flex-1 flex-col">
-          <div className="px-5 pt-[140px] lg:px-8">
+      <div className="relative flex h-full flex-col lg:flex-row">
+        {/* Left / Top: headline + dome (desktop) */}
+        <div className="relative flex flex-col lg:flex-1">
+          <div className="px-4 pb-3 pt-36 lg:px-8 lg:pb-0 lg:pt-[140px]">
             <div className="mb-2 flex items-center gap-3">
               <div className="h-px w-8 bg-dome-line opacity-70" />
               <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-dome-select opacity-75">
@@ -44,12 +45,16 @@ export const Hero = () => {
               {t("hero.headline")}
             </h1>
           </div>
-          <div className="flex flex-1 items-end justify-center pb-10">
+
+          {/* Dome — desktop only */}
+          <div className="hidden flex-1 items-end justify-center pb-10 lg:flex">
             <div className="h-full w-full max-w-3xl px-4 pt-10">
               <DomePlaceholder />
             </div>
           </div>
-          <div className="absolute bottom-5 left-5">
+
+          {/* Badge — desktop only */}
+          <div className="absolute bottom-5 left-5 hidden lg:block">
             <div className="flex items-center gap-3 px-3 py-2.5 backdrop-blur-sm">
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/60">
                 <svg
@@ -78,7 +83,9 @@ export const Hero = () => {
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 border-l border-border bg-transparent mt-[120px] lg:w-72">
+
+        {/* Right / Bottom: SearchPanel */}
+        <div className="flex min-h-0 flex-1 flex-col border-t border-border lg:mt-[120px] lg:flex-none lg:flex-shrink-0 lg:border-l lg:border-t-0 lg:w-72">
           <SearchPanel />
         </div>
       </div>

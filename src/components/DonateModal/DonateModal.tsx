@@ -46,7 +46,7 @@ export const DonateModal = ({ isOpen, onClose }: DonateModalProps) => {
           aria-modal="true"
           aria-labelledby="donate-modal-title"
           aria-describedby="donate-modal-desc"
-          className="relative max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-6 shadow-2xl"
+          className="relative max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-4 shadow-2xl sm:p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <button
