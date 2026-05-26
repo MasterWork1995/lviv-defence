@@ -9,22 +9,17 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+// Run to reset DB to clean state (e.g. before production launch)
 async function main() {
-  const defaults = [
-    { key: "total_goal_kopecks", value: "100000000000" }, // 1 000 000 000 грн
-    { key: "total_area_m2",      value: "21833000000" },  // 21 833 км² Львівщини
-    { key: "collected_kopecks",  value: "0" },
-  ];
+  await prisma.donation.deleteMany();
+  await prisma.expense.deleteMany();
 
-  for (const s of defaults) {
-    await prisma.setting.upsert({
-      where: { key: s.key },
-      update: { value: s.value },
-      create: s,
-    });
-  }
+  await prisma.setting.upsert({ where: { key: "total_goal_uah" },            update: { value: "1000000000" },       create: { key: "total_goal_uah",            value: "1000000000"       } });
+  await prisma.setting.upsert({ where: { key: "total_area_m2" },             update: { value: "21833000000" },      create: { key: "total_area_m2",             value: "21833000000"      } });
+  await prisma.setting.upsert({ where: { key: "collected_uah" },             update: { value: "0" },                create: { key: "collected_uah",             value: "0"                } });
+  await prisma.setting.upsert({ where: { key: "donate_preset_amounts_uah" }, update: { value: "[100,500,1000,5000]" }, create: { key: "donate_preset_amounts_uah", value: "[100,500,1000,5000]" } });
 
-  console.log("Settings seeded.");
+  console.log("✓ DB reset to clean state.");
 }
 
 main().finally(() => pool.end());

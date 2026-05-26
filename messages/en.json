@@ -53,7 +53,8 @@
     "validation": "Please check the entered data.",
     "server": "Server temporarily unavailable. Please try again later.",
     "loadFailed": "Failed to load",
-    "retry": "Try again"
+    "retry": "Try again",
+    "paymentNotConfigured": "This payment method is temporarily unavailable."
   },
   "donateModal": {
     "title": "Cover your sky",
@@ -88,6 +89,17 @@
     "termsLabel": "I agree to the offer terms and privacy policy",
     "submit": "Proceed to payment",
     "submitting": "Processing...",
+    "paymentMethod": "Payment method",
+    "amountSummary": "{amount} ₴",
+    "areaUnitM2": "{value} m²",
+    "areaUnitKm2": "{value} km²",
+    "providers": {
+      "monobank": "monobank",
+      "liqpay": "LiqPay"
+    },
+    "selectMonobank": "Select monobank",
+    "selectLiqpay": "Select LiqPay",
+    "dialogLabel": "Donation form",
     "errorMinAmount": "Minimum amount is 1 ₴",
     "errorName": "Enter a name or select 'Anonymous'"
   },

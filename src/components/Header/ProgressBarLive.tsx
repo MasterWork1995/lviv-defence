@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ProgressBar } from "./ProgressBar";
+import { fetchSettings } from "@/lib/client-settings-cache";
 
 interface ProgressData {
   percent: number;
@@ -11,29 +12,25 @@ interface ProgressData {
 
 const POLL_INTERVAL = 30_000;
 
+function toProgressData(json: {
+  progressPercent: number;
+  collectedAreaM2: number;
+  totalAreaM2: number;
+}): ProgressData {
+  return {
+    percent: json.progressPercent,
+    area: Math.round(json.collectedAreaM2 / 1_000_000),
+    total: Math.round(json.totalAreaM2 / 1_000_000),
+  };
+}
+
 export function ProgressBarLive({ initial }: { initial: ProgressData }) {
   const [data, setData] = useState<ProgressData>(initial);
-  const dataRef = useRef(data);
-  dataRef.current = data;
 
   useEffect(() => {
     const poll = async () => {
-      try {
-        const res = await fetch("/api/settings");
-        if (!res.ok) return;
-        const json = await res.json() as {
-          progressPercent: number;
-          collectedAreaM2: number;
-          totalAreaM2: number;
-        };
-        setData({
-          percent: json.progressPercent,
-          area: Math.round(json.collectedAreaM2 / 1_000_000),
-          total: Math.round(json.totalAreaM2 / 1_000_000),
-        });
-      } catch {
-        // Мовчки — не скидаємо поточне значення при помилці мережі
-      }
+      const json = await fetchSettings({ force: true });
+      if (json) setData(toProgressData(json));
     };
 
     const id = setInterval(poll, POLL_INTERVAL);

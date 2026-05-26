@@ -53,7 +53,8 @@
     "validation": "Перевірте правильність введених даних.",
     "server": "Сервер тимчасово недоступний. Спробуйте пізніше.",
     "loadFailed": "Помилка завантаження",
-    "retry": "Спробувати ще раз"
+    "retry": "Спробувати ще раз",
+    "paymentNotConfigured": "Цей метод оплати тимчасово недоступний."
   },
   "donateModal": {
     "title": "Закрий своє небо",
@@ -88,6 +89,17 @@
     "termsLabel": "Я погоджуюсь з умовами оферти та політикою конфіденційності",
     "submit": "Перейти до оплати",
     "submitting": "Обробляємо...",
+    "paymentMethod": "Метод оплати",
+    "amountSummary": "{amount} ₴",
+    "areaUnitM2": "{value} м²",
+    "areaUnitKm2": "{value} км²",
+    "providers": {
+      "monobank": "monobank",
+      "liqpay": "LiqPay"
+    },
+    "selectMonobank": "Оберіть monobank",
+    "selectLiqpay": "Оберіть LiqPay",
+    "dialogLabel": "Форма донату",
     "errorMinAmount": "Мінімальна сума — 1 ₴",
     "errorName": "Вкажіть ім'я або оберіть «Анонімно»"
   },

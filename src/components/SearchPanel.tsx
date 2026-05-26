@@ -2,7 +2,30 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { DonateModal } from "./DonateModal";
+import { DonateModal } from "@/components/DonateModal";
+
+const SKELETON_WIDTHS = ["60%", "45%", "72%", "38%", "55%", "68%", "42%"];
+
+function DonorListSkeleton() {
+  return (
+    <div className="space-y-0.5" aria-hidden="true">
+      {SKELETON_WIDTHS.map((w, i) => (
+        <div key={i} className="rounded border border-transparent px-3 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <div
+              className="h-2.5 animate-pulse rounded bg-surface-2"
+              style={{ width: w }}
+            />
+            <div className="h-2.5 w-12 animate-pulse rounded bg-surface-2" />
+          </div>
+          {i % 3 === 0 && (
+            <div className="mt-1.5 h-2 w-14 animate-pulse rounded bg-surface-2 opacity-60" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 interface Donor {
   id: string;
@@ -115,7 +138,7 @@ export function SearchPanel() {
         {/* Results list */}
         <div className="min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           {loading ? (
-            <p className="py-6 text-center text-xs text-text-muted">{t("common.loading")}</p>
+            <DonorListSkeleton />
           ) : fetchError ? (
             <div className="flex flex-col items-center gap-2 py-6">
               <p className="text-center text-xs text-red-400">{t("errors.loadFailed")}</p>

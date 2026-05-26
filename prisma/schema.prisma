@@ -9,11 +9,12 @@ datasource db {
 model Donation {
   id        String   @id @default(cuid())
   name      String
-  amount    Int      // сума в копійках
+  amount    Int      // сума в гривнях (UAH)
   squareM2  Float    // розрахована площа м²
   sector    Int?     // індекс hex-сегмента
-  status    String   @default("pending") // pending | paid | cancelled
-  txId      String?  @unique             // Monobank invoice id
+  status    String   @default("pending")  // pending | paid | cancelled
+  provider  String   @default("monobank") // monobank | liqpay
+  txId      String?  @unique              // Monobank invoiceId або LiqPay order_id
   isHidden  Boolean  @default(false)     // модерація адміном
   isManual  Boolean  @default(false)     // вручну через адмінку
   createdAt DateTime @default(now())
@@ -31,7 +32,8 @@ model Setting {
   key   String @id
   value String
   // keys used:
-  //   total_goal_kopecks   — ціль збору
-  //   total_area_m2        — загальна площа купола
-  //   collected_kopecks    — кешована сума (оновлюється вебхуком)
+  //   total_goal_uah            — ціль збору у грн
+  //   total_area_m2             — загальна площа купола
+  //   collected_uah             — кешована сума у грн (оновлюється вебхуком)
+  //   donate_preset_amounts_uah — JSON-масив пресетів, напр. [100,500,1000,5000]
 }
