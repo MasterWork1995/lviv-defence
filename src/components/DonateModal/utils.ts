@@ -7,10 +7,13 @@ export const formatUah = (amount: number, locale: string): string =>
 
 export const formatArea = (m2: number, t: Translate): string => {
   if (m2 === 0) return "";
-  if (m2 < 1_000_000) {
-    return t("donateModal.areaUnitM2", { value: m2.toFixed(0) });
+  if (m2 < 100_000) {
+    return t("donateModal.areaUnitM2", {
+      value: new Intl.NumberFormat("uk-UA").format(Math.round(m2)),
+    });
   }
+  const km2 = m2 / 1_000_000;
   return t("donateModal.areaUnitKm2", {
-    value: (m2 / 1_000_000).toFixed(2),
+    value: km2 >= 1 ? km2.toFixed(2) : km2.toFixed(3),
   });
 };

@@ -33,7 +33,7 @@ export const Hero = () => {
       <div className="relative flex h-full flex-col lg:flex-row">
         {/* Left / Top: headline + dome (desktop) */}
         <div className="relative flex flex-col lg:flex-1">
-          <div className="px-4 pb-3 pt-36 lg:px-8 lg:pb-0 lg:pt-[140px]">
+          <div className="px-4 pb-3 pt-40 lg:px-8 lg:pb-0 lg:pt-[140px]">
             <div className="mb-2 flex items-center gap-3">
               <div className="h-px w-8 bg-dome-line opacity-70" />
               <span className="text-[9px] font-semibold uppercase tracking-[0.35em] text-dome-select opacity-75">

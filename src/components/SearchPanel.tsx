@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { DonateModal } from "@/components/DonateModal";
+import { formatArea } from "@/components/DonateModal/utils";
 
 const SKELETON_WIDTHS = ["60%", "45%", "72%", "38%", "55%", "68%", "42%"];
 
@@ -97,13 +98,6 @@ export function SearchPanel() {
   const toggle = (donor: Donor) =>
     setSelected((prev) => (prev?.id === donor.id ? null : donor));
 
-  const formatArea = (m2: number) => {
-    const km2 = m2 / 1_000_000;
-    return km2 >= 0.01
-      ? `${km2.toFixed(2)} км²`
-      : `${m2.toFixed(2)} м²`;
-  };
-
   return (
     <>
       <DonateModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
@@ -165,7 +159,7 @@ export function SearchPanel() {
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-[11px] font-medium text-text">{donor.name}</span>
                   <span className="flex-shrink-0 text-[10px] font-bold text-primary">
-                    {formatArea(donor.squareM2)}
+                    {formatArea(donor.squareM2, t)}
                   </span>
                 </div>
                 {donor.sector !== null && (
@@ -191,7 +185,7 @@ export function SearchPanel() {
                 )}
               </div>
               <span className="flex-shrink-0 rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
-                {formatArea(selected.squareM2)}
+                {formatArea(selected.squareM2, t)}
               </span>
             </div>
             <div className="mb-2 h-px bg-border" />
