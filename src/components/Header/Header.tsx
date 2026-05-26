@@ -21,7 +21,6 @@ export const Header = async () => {
   return (
     // NOT absolute — grid takes care of layout; header is always in flow
     <header className="z-50 flex flex-shrink-0 flex-col gap-1.5 border-b border-border/60 bg-bg/96 px-4 py-2.5 backdrop-blur-md lg:flex-row lg:items-center lg:gap-6 lg:px-6 lg:py-3">
-
       {/* ── Logo row ── */}
       <div className="flex flex-shrink-0 items-center gap-2.5">
         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded border border-gold/30 bg-surface-2 lg:h-11 lg:w-11">

@@ -23,8 +23,7 @@ function DomeLoader() {
         <span
           className="relative h-3 w-3 rounded-full bg-primary"
           style={{
-            boxShadow:
-              "0 0 16px #00c8f0, 0 0 40px rgba(0,200,240,0.5)",
+            boxShadow: "0 0 16px #00c8f0, 0 0 40px rgba(0,200,240,0.5)",
           }}
         />
       </div>

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { DomeScene } from "./DomeScene";
+import { useDomeSelection, setSelected } from "./store";
 import type { DonorData } from "./hexUtils";
 
 function isWebGLAvailable(): boolean {
@@ -18,7 +19,7 @@ function isWebGLAvailable(): boolean {
 
 export default function DomeCanvas() {
   const [donors, setDonors] = useState<DonorData[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedId = useDomeSelection();
   const [webgl] = useState(isWebGLAvailable);
 
   useEffect(() => {
@@ -41,7 +42,11 @@ export default function DomeCanvas() {
     <div className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0.25, 3.1], fov: 68, near: 0.1, far: 100 }}
-        gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+        gl={{
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance",
+        }}
         onCreated={({ camera, gl }) => {
           // Look up at the dome center — creates the arch effect
           camera.lookAt(0, 0.9, 0);
@@ -54,7 +59,7 @@ export default function DomeCanvas() {
           <DomeScene
             donors={donors}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={setSelected}
           />
         </Suspense>
       </Canvas>
