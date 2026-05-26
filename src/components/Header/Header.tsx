@@ -54,7 +54,7 @@ export const Header = async () => {
         <ProgressBarLive
           initial={{
             percent: settings.progressPercent,
-            area: Math.round(settings.collectedAreaM2 / 1_000_000),
+            area: +(settings.collectedAreaM2 / 1_000_000).toFixed(1),
             total: Math.round(settings.totalAreaM2 / 1_000_000),
             collectedUah: settings.collectedUah,
             goalUah: settings.goalUah,
@@ -67,7 +67,7 @@ export const Header = async () => {
         <ProgressBarLive
           initial={{
             percent: settings.progressPercent,
-            area: Math.round(settings.collectedAreaM2 / 1_000_000),
+            area: +(settings.collectedAreaM2 / 1_000_000).toFixed(1),
             total: Math.round(settings.totalAreaM2 / 1_000_000),
             collectedUah: settings.collectedUah,
             goalUah: settings.goalUah,

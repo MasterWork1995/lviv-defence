@@ -44,15 +44,15 @@ export const ProgressBar: FC<ProgressBarProps> = ({
           {percent}%
         </span>
       </div>
-      <div className="flex flex-col gap-0.5 lg:flex-row lg:items-center lg:justify-between lg:gap-2">
-        <span className="text-[10px] font-bold uppercase lg:text-[12px]">
-          <span className="text-text-muted">{t("progress.fundedLabel")} </span>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <span className="whitespace-nowrap text-[10px] font-bold uppercase lg:text-[12px]">
+          <span className="text-text-muted">{t("progress.fundedLabel")}</span>{" "}
           <span className="text-primary">
             {formatUah(collectedUah, locale)} ₴ / {formatUah(goalUah, locale)} ₴
           </span>
         </span>
-        <span className="text-[10px] font-bold uppercase lg:text-[12px]">
-          <span className="text-text-muted">{t("progress.areaLabel")} </span>
+        <span className="whitespace-nowrap text-[10px] font-bold uppercase lg:text-[12px]">
+          <span className="text-text-muted">{t("progress.areaLabel")}</span>{" "}
           <span className="text-primary">
             {area} {t("progress.areaUnit")} / {total} {t("progress.areaUnit")}
           </span>

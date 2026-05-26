@@ -23,7 +23,7 @@ function toProgressData(json: {
 }): ProgressData {
   return {
     percent: json.progressPercent,
-    area: Math.round(json.collectedAreaM2 / 1_000_000),
+    area: +(json.collectedAreaM2 / 1_000_000).toFixed(1),
     total: Math.round(json.totalAreaM2 / 1_000_000),
     collectedUah: json.collectedUah,
     goalUah: json.goalUah,
