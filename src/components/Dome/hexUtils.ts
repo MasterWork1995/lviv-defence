@@ -3,12 +3,11 @@ import * as THREE from "three";
 /* ─────────────────────────────────────────────
    Goldberg-polyhedron dome cells.
 
-   Mathematically: subdivide an icosahedron, then take its DUAL — every vertex
-   becomes a face. Degree-6 vertices yield hexagons; the 12 original
-   icosahedron vertices yield pentagons. We keep only the upper hemisphere.
+   Subdivide an icosahedron, take its DUAL — every vertex becomes a face.
+   Degree-6 vertices yield hexagons; the 12 original icosahedron vertices
+   yield pentagons. Upper hemisphere only.
 
-   detail=2 → ~80 cells, detail=3 → ~320, detail=4 → ~1280.
-   3 is the sweet spot for the dome on the homepage.
+   detail=3 → ~150–180 cells in the upper hemisphere.
    ───────────────────────────────────────────── */
 
 export interface DomeCell {
@@ -21,9 +20,9 @@ export interface DomeCell {
   verts: THREE.Vector3[];
   /** true ⇒ 5-gon (12 of them), false ⇒ 6-gon */
   isPent: boolean;
-  /** azimuth around Y axis (in radians, range −π..π) — used to tween rotation */
+  /** azimuth around Y axis (in radians, range −π..π) */
   theta: number;
-  /** legacy: rough ring index (0 = top), kept for back-compat with old code */
+  /** legacy: rough ring index (0 = top) */
   ringIndex: number;
 }
 
@@ -35,10 +34,9 @@ export interface DonorData {
   sector: number | null;
 }
 
-export const DOME_RADIUS = 1.6;
+export const DOME_RADIUS = 3.4;     // bigger — fills hero width
 const SUBDIVISION = 3;
 
-/* ─── one-time mesh build (memoised at module load) ─── */
 let CELLS_CACHE: DomeCell[] | null = null;
 
 export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
@@ -63,7 +61,7 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
   };
   for (let i = 0; i < arr.length; i += 9) {
     tris.push([
-      vid(arr[i], arr[i + 1], arr[i + 2]),
+      vid(arr[i],     arr[i + 1], arr[i + 2]),
       vid(arr[i + 3], arr[i + 4], arr[i + 5]),
       vid(arr[i + 6], arr[i + 7], arr[i + 8]),
     ]);
@@ -79,10 +77,10 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
     }),
   );
 
-  // 3. one face per vertex (centroid + neighboring tri centers as boundary)
+  // 3. one face per vertex
   const out: DomeCell[] = [];
   v2t.forEach((triList, vi) => {
-    if (triList.length < 5) return; // ignore boundary verts (shouldn't happen on sphere)
+    if (triList.length < 5) return;
 
     const cx = verts[vi * 3];
     const cy = verts[vi * 3 + 1];
@@ -92,75 +90,48 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
 
     const boundary = triList.map((ti) => {
       const [a, b, c] = tris[ti];
-      const x = (verts[a * 3] + verts[b * 3] + verts[c * 3]) / 3;
+      const x = (verts[a * 3]     + verts[b * 3]     + verts[c * 3])     / 3;
       const y = (verts[a * 3 + 1] + verts[b * 3 + 1] + verts[c * 3 + 1]) / 3;
       const z = (verts[a * 3 + 2] + verts[b * 3 + 2] + verts[c * 3 + 2]) / 3;
-      // push triangle centroid out to the sphere surface
       const k = radius / Math.hypot(x, y, z);
       return new THREE.Vector3(x * k, y * k, z * k);
     });
 
-    // sort boundary points by angle around the face normal so the polygon is convex
-    const u = (
-      Math.abs(normal.y) < 0.99
-        ? new THREE.Vector3(0, 1, 0)
-        : new THREE.Vector3(1, 0, 0)
-    )
-      .cross(normal)
-      .normalize();
+    const u = (Math.abs(normal.y) < 0.99
+      ? new THREE.Vector3(0, 1, 0)
+      : new THREE.Vector3(1, 0, 0)
+    ).cross(normal).normalize();
     const v = new THREE.Vector3().crossVectors(normal, u);
     boundary.sort((A, B) => {
-      const a1 = Math.atan2(
-        A.clone().sub(position).dot(v),
-        A.clone().sub(position).dot(u),
-      );
-      const a2 = Math.atan2(
-        B.clone().sub(position).dot(v),
-        B.clone().sub(position).dot(u),
-      );
+      const a1 = Math.atan2(A.clone().sub(position).dot(v), A.clone().sub(position).dot(u));
+      const a2 = Math.atan2(B.clone().sub(position).dot(v), B.clone().sub(position).dot(u));
       return a1 - a2;
     });
 
     out.push({
-      index: 0, // assigned after filtering
-      position,
-      normal,
-      verts: boundary,
+      index: 0,
+      position, normal, verts: boundary,
       isPent: boundary.length === 5,
       theta: Math.atan2(cx, cz),
-      ringIndex: Math.round((1 - cy / radius) * 4), // 0..~8 — for legacy refs
+      ringIndex: Math.round((1 - cy / radius) * 4),
     });
   });
 
-  // 4. keep upper hemisphere only (y > -ε)
   const upper = out.filter((f) => f.position.y > -0.05 * radius);
-  // 5. assign final indices (used for InstancedMesh / sector matching)
-  upper.forEach((c, i) => {
-    c.index = i;
-  });
+  upper.forEach((c, i) => { c.index = i; });
 
   CELLS_CACHE = upper;
   return upper;
 }
 
-/* ─────────────────────────────────────────────
-   Donor → cell assignment.
-
-   Picks 10 cells spread evenly around the dome at varied latitudes,
-   skipping the 12 pentagons so donors always land on hexes.
-   Returns indices in the same order as the input donors (sorted by area DESC).
-   ───────────────────────────────────────────── */
-export function pickDonorCells(
-  cells: DomeCell[],
-  donorCount: number,
-): number[] {
+/* Donor → cell assignment: spread evenly across azimuth, skip pentagons. */
+export function pickDonorCells(cells: DomeCell[], donorCount: number): number[] {
   const targets: { theta: number; phi: number }[] = [];
-  // jittered fibonacci-style spread
   for (let i = 0; i < donorCount; i++) {
     const t = (i + 0.5) / donorCount;
     targets.push({
       theta: t * Math.PI * 2,
-      phi: 0.45 + (i % 3) * 0.25, // alternates between 3 latitudes
+      phi: 0.45 + (i % 3) * 0.25,
     });
   }
   const used = new Set<number>();
@@ -172,14 +143,9 @@ export function pickDonorCells(
     let bestD = Infinity;
     cells.forEach((c, i) => {
       if (used.has(i) || c.isPent) return;
-      const dx = c.normal.x - tx;
-      const dy = c.normal.y - ty;
-      const dz = c.normal.z - tz;
+      const dx = c.normal.x - tx, dy = c.normal.y - ty, dz = c.normal.z - tz;
       const d = dx * dx + dy * dy + dz * dz;
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-      }
+      if (d < bestD) { bestD = d; best = i; }
     });
     if (best >= 0) used.add(best);
     return best;
@@ -187,8 +153,96 @@ export function pickDonorCells(
 }
 
 /* ─────────────────────────────────────────────
-   Deterministic per-cell pseudo-random (for hue/brightness variation)
+   STABLE mapping from donors → cells.
+
+   Key property: positions of the TOP-10 donors DO NOT change when
+   `selectedId` changes.  This was the source of the "crooked" feel —
+   previously we re-ran pickDonorCells() on every selection, which
+   shuffled all 10 positions whenever a 11th was added.
+
+   Strategy:
+     1. Sort donors by squareM2 desc.
+     2. Top 10 get assigned to cells via pickDonorCells (stable: depends only
+        on donors, not selectedId).
+     3. If the selected donor is OUTSIDE top 10, pick a free cell for them
+        based on a hash of their id (deterministic, stable per donor).
    ───────────────────────────────────────────── */
+export interface DonorCellMap {
+  /** cellIndex → donor */
+  byCell: Map<number, DonorData>;
+  /** donor.id → cellIndex */
+  byDonor: Map<string, number>;
+}
+
+const baseMapCache = new WeakMap<DonorData[], DonorCellMap>();
+
+export function mapTop10ToCells(
+  cells: DomeCell[],
+  donors: DonorData[],
+): DonorCellMap {
+  // Memo on the donors array reference — recomputes only when donors actually change.
+  const cached = baseMapCache.get(donors);
+  if (cached) return cached;
+
+  const sorted = [...donors].sort((a, b) => b.squareM2 - a.squareM2);
+  const top10 = sorted.slice(0, 10);
+  const byCell = new Map<number, DonorData>();
+  const byDonor = new Map<string, number>();
+
+  // 1. Honour explicit `sector` first (top-10 only)
+  const reserved = new Set<number>();
+  const claimed = new Set<string>();
+  top10.forEach((d) => {
+    if (d.sector != null && d.sector < cells.length && !cells[d.sector].isPent) {
+      reserved.add(d.sector);
+      byCell.set(d.sector, d);
+      byDonor.set(d.id, d.sector);
+      claimed.add(d.id);
+    }
+  });
+
+  // 2. Remaining top-10 → pickDonorCells over the free cells
+  const remaining = top10.filter((d) => !claimed.has(d.id));
+  const free = cells.filter((c) => !reserved.has(c.index));
+  const picks = pickDonorCells(free, remaining.length);
+  remaining.forEach((d, i) => {
+    const idx = free[picks[i]]?.index;
+    if (idx != null) {
+      byCell.set(idx, d);
+      byDonor.set(d.id, idx);
+    }
+  });
+
+  const result = { byCell, byDonor };
+  baseMapCache.set(donors, result);
+  return result;
+}
+
+/** Pick a deterministic free cell for a donor outside top-10 (for selection). */
+export function pickExtraCellFor(
+  cells: DomeCell[],
+  baseMap: DonorCellMap,
+  donor: DonorData,
+): number | null {
+  if (baseMap.byDonor.has(donor.id)) return baseMap.byDonor.get(donor.id)!;
+  if (donor.sector != null && donor.sector < cells.length && !cells[donor.sector].isPent
+      && !baseMap.byCell.has(donor.sector)) {
+    return donor.sector;
+  }
+  const free = cells.filter(
+    (c) => !c.isPent && !baseMap.byCell.has(c.index),
+  );
+  if (free.length === 0) return null;
+  // hash donor.id → stable index
+  let h = 2166136261;
+  for (let i = 0; i < donor.id.length; i++) {
+    h ^= donor.id.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return free[(h >>> 0) % free.length].index;
+}
+
+/* Deterministic per-cell pseudo-random (hue/brightness variation) */
 export function cellHash(i: number): number {
   let x = ((i * 2654435761) >>> 0) ^ 0x9e3779b9;
   x = (x ^ (x >>> 16)) >>> 0;
@@ -197,9 +251,6 @@ export function cellHash(i: number): number {
   return (x >>> 0) / 4294967295;
 }
 
-/* ─────────────────────────────────────────────
-   Format helpers (kept from the previous implementation)
-   ───────────────────────────────────────────── */
 export function fmtArea(m2: number): string {
   if (m2 <= 0) return "";
   if (m2 < 100_000) {
@@ -209,12 +260,12 @@ export function fmtArea(m2: number): string {
   return (km2 >= 1 ? km2.toFixed(2) : km2.toFixed(3)) + " км²";
 }
 
-/* ─── legacy exports kept for backwards-compatibility with older code ─── */
+/* ─── legacy exports kept for backwards-compatibility ─── */
 export const TOTAL_CELLS = (() => generateDomeCells().length)();
 
-/** @deprecated — kept only for components that haven't migrated yet */
+/** @deprecated */
 export const HEX_OUTER = 0.235;
-/** @deprecated — kept only for components that haven't migrated yet */
+/** @deprecated */
 export const HEX_INNER = 0.185;
 
 /** @deprecated — Goldberg cells already carry their own vertex polygon */

@@ -1,73 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { Donor } from "../types";
+/**
+ * Adapter hook — keeps the same shape useDonorSearch returned before
+ * (query / setQuery / donors / loading / fetchError / handleRetry), but
+ * now reads from the SHARED donor store instead of fetching independently.
+ *
+ * Result: typing in the search box still triggers the debounced fetch, and
+ * polling is centralised in donorsStore — so the dome and the search list
+ * always show the same data and we make 1 fetch instead of 4.
+ */
 
-const DEBOUNCE_MS = 300;
-const POLL_MS = 30_000;
+import {
+  useDonors,
+  setSearchQuery,
+  retryFetch,
+} from "@/components/Dome/donorsStore";
 
 export const useDonorSearch = () => {
-  const [query, setQuery] = useState("");
-  const [donors, setDonors] = useState<Donor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const queryRef = useRef(query);
-  queryRef.current = query;
-
-  const fetchDonors = async (q: string, silent = false) => {
-    if (!silent) {
-      setLoading(true);
-      setFetchError(false);
-    }
-    try {
-      const trimmed = q.trim();
-      const url =
-        trimmed.length > 1
-          ? `/api/donations?q=${encodeURIComponent(trimmed)}`
-          : "/api/donations";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as { donations: Donor[] };
-      setDonors(data.donations ?? []);
-      setFetchError(false);
-    } catch {
-      if (!silent) {
-        setFetchError(true);
-        setDonors([]);
-      }
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchDonors(query);
-    }, DEBOUNCE_MS);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [query, retryCount]);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      fetchDonors(queryRef.current, true);
-    }, POLL_MS);
-    return () => clearInterval(id);
-  }, []);
-
-  const handleRetry = () => setRetryCount((c) => c + 1);
+  const { donors, query, loading, fetchError } = useDonors();
 
   return {
     query,
-    setQuery,
+    setQuery: setSearchQuery,
     donors,
     loading,
     fetchError,
-    handleRetry,
+    handleRetry: retryFetch,
   };
 };
