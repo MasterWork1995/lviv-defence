@@ -11,14 +11,17 @@ import {
   cellHash,
   fmtArea,
   DOME_RADIUS,
+  DOME_LABEL_PRESETS,
   type DonorData,
   type DomeCell,
+  type DomeViewport,
 } from "./hexUtils";
 
 interface Props {
   donors: DonorData[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  viewport?: DomeViewport;
 }
 
 /* ─────────────────────────────────────────────
@@ -55,7 +58,13 @@ function tierBorderColor(tier: "small" | "medium" | "large", multiplier = 1) {
   return c.multiplyScalar(multiplier);
 }
 
-export function HexCells({ donors, selectedId, onSelect }: Props) {
+export function HexCells({
+  donors,
+  selectedId,
+  onSelect,
+  viewport = "desktop",
+}: Props) {
+  const labelUi = DOME_LABEL_PRESETS[viewport];
   const cells = useMemo(() => generateDomeCells(DOME_RADIUS), []);
 
   /* Map donors → cells — STABLE.
@@ -84,8 +93,9 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
        (1) base lines   — per-vertex Y-axis gradient (dim → bright)
        (2) glow halo    — additive cyan over every line (the "glowing border")
        (3) accent layer — bright additive on ~18% random cells
-     Per-cell inset varies 0.65..0.98 so hexes look visibly different sizes.
   */
+  const BG_HEX_INSET = 0.92;
+
   const { bgBorderGeom, bgGlowGeom, bgAccentGeom, donorCellList } =
     useMemo(() => {
       const borderPos: number[] = [],
@@ -98,12 +108,8 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       cells.forEach((cell) => {
         if (cellToDonor.has(cell.index)) return;
         const h = cellHash(cell.index);
-        const isAccent = h > 0.82;
-        const baseAlpha = 0.03 + h * 0.14; // very transparent — reads as glass
-        const hueShift = (cellHash(cell.index + 99) - 0.5) * 0.05;
-
-        // Per-cell inset variation — visibly different hex sizes
-        const inset = 0.65 + cellHash(cell.index + 311) * 0.33;
+        const baseAlpha = 0.08;
+        const inset = BG_HEX_INSET;
         const c = cell.position;
         const ring = cell.verts.map(
           (p) =>
@@ -126,8 +132,7 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
         const colAt = (p: THREE.Vector3) => {
           const t = (p.y - minY) / yRange;
           const mixed = PALETTE.baseLineLow.clone().lerp(PALETTE.baseLine, t);
-          mixed.offsetHSL(hueShift, 0, 0).multiplyScalar(baseAlpha + t * 0.1);
-          return mixed;
+          return mixed.multiplyScalar(baseAlpha + t * 0.1);
         };
 
         for (let j = 0; j < ring.length; j++) {
@@ -179,8 +184,8 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       const anchor = c.position.clone().addScaledVector(c.normal, 0.02);
       const label = c.position
         .clone()
-        .addScaledVector(c.normal, 0.22)
-        .add(new THREE.Vector3(0, 0.12, 0));
+        .addScaledVector(c.normal, 0.14)
+        .add(new THREE.Vector3(0, 0.04, 0));
       out.push({
         key: donor.id,
         pos: [label.x, label.y, label.z],
@@ -252,6 +257,7 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
           key={label.key}
           position={label.pos}
           center
+          distanceFactor={labelUi.distanceFactor}
           zIndexRange={[100, 0]}
           style={{
             pointerEvents: label.selected ? "auto" : "none",
@@ -261,8 +267,8 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
         >
           <div
             style={{
-              transform: "translateY(-2px)",
-              padding: "5px 10px",
+              transform: `translateY(-1px) scale(${labelUi.uiScale})`,
+              padding: `${labelUi.padY}px ${labelUi.padX}px`,
               borderRadius: "999px",
               background: label.selected
                 ? "rgba(20, 8, 0, 0.85)"
@@ -281,17 +287,17 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
               lineHeight: 1.15,
               display: "flex",
               alignItems: "center",
-              gap: label.selected ? "6px" : 0,
+              gap: label.selected ? "4px" : 0,
             }}
           >
             <div>
               <div
                 style={{
-                  fontSize: "12px",
+                  fontSize: `${labelUi.namePx}px`,
                   fontWeight: 600,
                   letterSpacing: "0.01em",
                   color: label.selected ? "#ffd76b" : "#ffffff",
-                  maxWidth: "180px",
+                  maxWidth: `${labelUi.maxWidthPx}px`,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                 }}
@@ -301,7 +307,7 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
               {label.area && (
                 <div
                   style={{
-                    fontSize: "10px",
+                    fontSize: `${labelUi.areaPx}px`,
                     marginTop: 1,
                     color: label.selected ? "#ffe49a" : "#9fe9ff",
                     letterSpacing: "0.06em",
@@ -330,15 +336,15 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: 22,
-                  height: 22,
-                  marginLeft: 4,
+                  width: labelUi.namePx + 8,
+                  height: labelUi.namePx + 8,
+                  marginLeft: 2,
                   borderRadius: 999,
                   background: "rgba(240,180,41,0.18)",
                   border: "1px solid rgba(240,180,41,0.85)",
                   color: "#ffd76b",
                   fontFamily: "inherit",
-                  fontSize: 12,
+                  fontSize: labelUi.namePx,
                   lineHeight: 1,
                   padding: 0,
                   boxShadow: "0 0 10px rgba(240,180,41,0.45)",
@@ -355,7 +361,7 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       {/* Anchor dots on each labeled hex */}
       {labels.map((label) => (
         <mesh key={label.key + "-dot"} position={label.anchorPos}>
-          <sphereGeometry args={[0.025, 8, 8]} />
+          <sphereGeometry args={[labelUi.dotRadius, 8, 8]} />
           <meshBasicMaterial
             color={label.selected ? "#ffd76b" : "#9fe9ff"}
             transparent
@@ -368,10 +374,6 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   Single donor hex — fill + outline + glow + halo ring.
-   Uses side: FrontSide so clicks on the BACK of the dome are ignored.
-   ───────────────────────────────────────────── */
 function DonorHex({
   cell,
   donor,
@@ -519,14 +521,15 @@ function DonorHex({
     onSelect(selected ? null : donor.id);
   };
 
+  const pointerHandlers = {
+    onPointerOver: handlePointerOver,
+    onPointerOut: handlePointerOut,
+    onClick: handleClick,
+  };
+
   return (
     <group>
-      <mesh
-        geometry={fillGeom}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
-        onClick={handleClick}
-      >
+      <mesh geometry={fillGeom} {...pointerHandlers}>
         <meshBasicMaterial
           ref={fillMatRef}
           color={PALETTE.fillDonor}
@@ -534,7 +537,7 @@ function DonorHex({
           opacity={0.16}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          side={THREE.FrontSide} /* BLOCKS clicks through the dome */
+          side={THREE.DoubleSide}
           toneMapped={false}
         />
       </mesh>

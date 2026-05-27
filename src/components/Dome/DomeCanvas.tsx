@@ -1,11 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { DomeScene } from "./DomeScene";
+import { getDomeCameraSettings } from "./hexUtils";
 import { useDomeSelection, setSelected } from "./store";
 import { useDonors } from "./donorsStore";
+import { useDomeViewport } from "./useDomeViewport";
 
 function isWebGLAvailable(): boolean {
   if (typeof window === "undefined") return false;
@@ -18,17 +20,26 @@ function isWebGLAvailable(): boolean {
 }
 
 export default function DomeCanvas() {
-  const { donors } = useDonors();           // shared store — no fetch here
+  const { donors } = useDonors();
   const selectedId = useDomeSelection();
   const [webgl] = useState(isWebGLAvailable);
+  const viewport = useDomeViewport();
+  const domeCamera = useMemo(
+    () => getDomeCameraSettings(undefined, viewport),
+    [viewport],
+  );
 
   if (!webgl) return null;
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full touch-none">
       <Canvas
-        /* Camera tuned for DOME_RADIUS = 3.4 */
-        camera={{ position: [0, 0.7, 8.4], fov: 46, near: 0.1, far: 100 }}
+        camera={{
+          position: domeCamera.position,
+          fov: domeCamera.fov,
+          near: domeCamera.near,
+          far: domeCamera.far,
+        }}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
@@ -37,7 +48,12 @@ export default function DomeCanvas() {
         style={{ background: "transparent", touchAction: "none", cursor: "grab" }}
       >
         <Suspense fallback={null}>
-          <DomeScene donors={donors} selectedId={selectedId} onSelect={setSelected} />
+          <DomeScene
+            donors={donors}
+            selectedId={selectedId}
+            onSelect={setSelected}
+            viewport={viewport}
+          />
         </Suspense>
       </Canvas>
     </div>

@@ -14,40 +14,38 @@ export const Hero = () => {
   return (
     // h-full fills the CSS grid's 1fr row — no hardcoded pixel offsets
     <section className="relative h-full overflow-hidden">
-      {/* ══════════════════════════════════════
-          MOBILE  (flex-col, stacked)
-          ══════════════════════════════════════ */}
-      <div className="absolute inset-0 flex flex-col lg:hidden">
-        {/* Dome strip — background photo only here */}
-        <div className="relative overflow-hidden" style={{ flex: "0 0 42%" }}>
-          <Image
-            src="/Lviv.jpeg"
-            alt="Нічний Львів"
-            fill
-            priority
-            className="object-cover object-center"
-          />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{ background: VIGNETTE }}
-          />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{ background: RADIAL }}
-          />
-          <DomeCanvas />
+      <div className="absolute inset-0 flex flex-col xl:hidden">
+        <div className="relative z-0 shrink-0 basis-[clamp(200px,36vh,340px)] overflow-hidden md:basis-[50vh] md:min-h-[50vh] md:max-h-[62vh] lg:basis-[52vh] lg:min-h-[50vh] lg:max-h-[60vh]">
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src="/Lviv.jpeg"
+              alt="Нічний Львів"
+              fill
+              priority
+              className="object-cover object-center"
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ background: VIGNETTE }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ background: RADIAL }}
+            />
+          </div>
+          <div className="absolute inset-0 z-[1] flex items-center justify-center overflow-hidden">
+            <div className="h-[92%] w-full max-w-[min(100%,720px)] md:h-[96%]">
+              <DomeCanvas />
+            </div>
+          </div>
         </div>
 
-        {/* Search panel — solid dark, no photo bleed */}
-        <div className="flex min-h-0 flex-1 flex-col bg-bg">
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col border-t border-primary/10 bg-bg shadow-[0_-12px_40px_rgba(4,9,26,0.85)]">
           <SearchPanel />
         </div>
       </div>
 
-      {/* ══════════════════════════════════════
-          DESKTOP  (flex-row, side-by-side)
-          ══════════════════════════════════════ */}
-      <div className="absolute inset-0 hidden lg:flex">
+      <div className="absolute inset-0 hidden xl:flex">
         {/* Full-section background */}
         <Image
           src="/Lviv.jpeg"

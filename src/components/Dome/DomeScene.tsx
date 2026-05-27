@@ -8,9 +8,11 @@ import { HexCells } from "./HexCells";
 import {
   DOME_RADIUS,
   generateDomeCells,
+  getDomeCameraSettings,
   mapTop10ToCells,
   pickExtraCellFor,
   type DonorData,
+  type DomeViewport,
 } from "./hexUtils";
 
 const R = DOME_RADIUS;
@@ -21,6 +23,7 @@ interface Props {
   donors: DonorData[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  viewport?: DomeViewport;
 }
 
 /* Fresnel rim — bright cyan only at the silhouette of the dome */
@@ -53,7 +56,12 @@ function makeRimMaterial(color = 0x00c8f0, maxOpacity = 0.32) {
   });
 }
 
-export function DomeScene({ donors, selectedId, onSelect }: Props) {
+export function DomeScene({
+  donors,
+  selectedId,
+  onSelect,
+  viewport = "desktop",
+}: Props) {
   const domeRef = useRef<THREE.Group>(null!);
   const rotTween = useRef<gsap.core.Tween | null>(null);
   const camTween = useRef<gsap.core.Tween | null>(null);
@@ -70,14 +78,26 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
 
   const { camera, gl } = useThree();
 
-  const BASE_CAM = useRef(new THREE.Vector3(0, R * 0.25, R * 2.5));
-  const BASE_LOOK = useRef(new THREE.Vector3(0, R * 0.55, 0));
+  const camSettings = useMemo(
+    () => getDomeCameraSettings(R, viewport),
+    [viewport],
+  );
+  const BASE_CAM = useRef(
+    new THREE.Vector3(...camSettings.position),
+  );
+  const BASE_LOOK = useRef(new THREE.Vector3(...camSettings.lookAt));
 
-  /* Set initial camera once */
   useEffect(() => {
+    const s = getDomeCameraSettings(R, viewport);
+    BASE_CAM.current.set(...s.position);
+    BASE_LOOK.current.set(...s.lookAt);
     camera.position.copy(BASE_CAM.current);
     camera.lookAt(BASE_LOOK.current);
-  }, [camera]);
+    if ("fov" in camera) {
+      (camera as THREE.PerspectiveCamera).fov = s.fov;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera, R, viewport]);
 
   /* ── Drag-to-rotate (Y axis + clamped X tilt) ── */
   useEffect(() => {
@@ -292,7 +312,12 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
         </mesh>
 
         {/* Hex network */}
-        <HexCells donors={donors} selectedId={selectedId} onSelect={onSelect} />
+        <HexCells
+          donors={donors}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          viewport={viewport}
+        />
       </group>
     </>
   );

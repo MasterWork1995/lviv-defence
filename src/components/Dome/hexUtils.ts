@@ -34,13 +34,84 @@ export interface DonorData {
   sector: number | null;
 }
 
-export const DOME_RADIUS = 4.5; // bigger — fills hero width
+export const DOME_RADIUS = 4.5;
 const SUBDIVISION = 3;
 
+export type DomeViewport = "desktop" | "tablet" | "mobile";
+
+const DOME_CAMERA_PRESETS: Record<
+  DomeViewport,
+  { z: number; y: number; fov: number; lookAtYFactor: number }
+> = {
+  desktop: { z: 8.4, y: 0.7, fov: 46, lookAtYFactor: 0.4 },
+  tablet: { z: 11.6, y: 0.64, fov: 42, lookAtYFactor: 0.36 },
+  mobile: { z: 10.8, y: 0.66, fov: 40, lookAtYFactor: 0.38 },
+};
+
+export const DOME_LABEL_PRESETS: Record<
+  DomeViewport,
+  {
+    distanceFactor: number;
+    uiScale: number;
+    namePx: number;
+    areaPx: number;
+    maxWidthPx: number;
+    padY: number;
+    padX: number;
+    dotRadius: number;
+  }
+> = {
+  desktop: {
+    distanceFactor: 12,
+    uiScale: 0.88,
+    namePx: 10,
+    areaPx: 8,
+    maxWidthPx: 110,
+    padY: 3,
+    padX: 7,
+    dotRadius: 0.016,
+  },
+  tablet: {
+    distanceFactor: 13,
+    uiScale: 0.88,
+    namePx: 10,
+    areaPx: 8,
+    maxWidthPx: 110,
+    padY: 3,
+    padX: 7,
+    dotRadius: 0.016,
+  },
+  mobile: {
+    distanceFactor: 10,
+    uiScale: 0.76,
+    namePx: 9,
+    areaPx: 7,
+    maxWidthPx: 96,
+    padY: 2,
+    padX: 6,
+    dotRadius: 0.014,
+  },
+};
+
+export const getDomeCameraSettings = (
+  radius = DOME_RADIUS,
+  viewport: DomeViewport = "desktop",
+) => {
+  const p = DOME_CAMERA_PRESETS[viewport];
+  return {
+    position: [0, p.y, p.z] as [number, number, number],
+    lookAt: [0, radius * p.lookAtYFactor, 0] as [number, number, number],
+    fov: p.fov,
+    near: 0.1,
+    far: 100,
+  };
+};
+
 let CELLS_CACHE: DomeCell[] | null = null;
+let CELLS_CACHE_RADIUS: number | null = null;
 
 export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
-  if (CELLS_CACHE && radius === DOME_RADIUS) return CELLS_CACHE;
+  if (CELLS_CACHE && CELLS_CACHE_RADIUS === radius) return CELLS_CACHE;
 
   const ico = new THREE.IcosahedronGeometry(radius, SUBDIVISION);
   const arr = ico.attributes.position.array as Float32Array;
@@ -133,11 +204,22 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
     c.index = i;
   });
 
+  CELLS_CACHE_RADIUS = radius;
   CELLS_CACHE = upper;
   return upper;
 }
 
-/* Donor → cell assignment: spread evenly across azimuth, skip pentagons. */
+const DONOR_VIEW_BIAS = new THREE.Vector3(0, 0.22, 1).normalize();
+
+export function cellPlacementScore(cell: DomeCell): number {
+  const n = cell.normal;
+  const front = Math.max(0, n.dot(DONOR_VIEW_BIAS));
+  const idealY = 0.38;
+  const yFit = 1 - Math.min(1, Math.abs(n.y - idealY) / 0.4);
+  const apexPenalty = n.y > 0.72 ? (n.y - 0.72) * 4 : 0;
+  return front * 0.6 + yFit * 0.4 - apexPenalty;
+}
+
 export function pickDonorCells(
   cells: DomeCell[],
   donorCount: number,
@@ -147,7 +229,7 @@ export function pickDonorCells(
     const t = (i + 0.5) / donorCount;
     targets.push({
       theta: t * Math.PI * 2,
-      phi: 0.45 + (i % 3) * 0.25,
+      phi: 1.12 + (i % 4) * 0.11,
     });
   }
   const used = new Set<number>();
@@ -156,15 +238,16 @@ export function pickDonorCells(
     const ty = Math.cos(t.phi);
     const tz = Math.sin(t.phi) * Math.cos(t.theta);
     let best = -1;
-    let bestD = Infinity;
+    let bestScore = Infinity;
     cells.forEach((c, i) => {
       if (used.has(i) || c.isPent) return;
       const dx = c.normal.x - tx,
         dy = c.normal.y - ty,
         dz = c.normal.z - tz;
-      const d = dx * dx + dy * dy + dz * dz;
-      if (d < bestD) {
-        bestD = d;
+      const dist = dx * dx + dy * dy + dz * dz;
+      const score = dist - cellPlacementScore(c) * 0.42;
+      if (score < bestScore) {
+        bestScore = score;
         best = i;
       }
     });
@@ -260,13 +343,22 @@ export function pickExtraCellFor(
   }
   const free = cells.filter((c) => !c.isPent && !baseMap.byCell.has(c.index));
   if (free.length === 0) return null;
-  // hash donor.id → stable index
   let h = 2166136261;
   for (let i = 0; i < donor.id.length; i++) {
     h ^= donor.id.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
-  return free[(h >>> 0) % free.length].index;
+  const tie = ((h >>> 0) % 1000) / 100000;
+  let best = free[0].index;
+  let bestScore = -Infinity;
+  for (const c of free) {
+    const s = cellPlacementScore(c) + tie;
+    if (s > bestScore) {
+      bestScore = s;
+      best = c.index;
+    }
+  }
+  return best;
 }
 
 /* Deterministic per-cell pseudo-random (hue/brightness variation) */
