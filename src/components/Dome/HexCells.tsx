@@ -26,15 +26,14 @@ interface Props {
    (top-of-hex bright, bottom-of-hex dim) for a more "glass shield" look.
    ───────────────────────────────────────────── */
 const PALETTE = {
-  baseLine:     new THREE.Color("#1a65c0"),  // gradient top
-  baseLineLow:  new THREE.Color("#0a2848"),  // gradient bottom (darker)
-  glowCyan:     new THREE.Color("#38b0f0"),  // additive halo over every line
-  accentCyan:   new THREE.Color("#9fe9ff"),  // ~18% brightest cells
-  donorBorder:    new THREE.Color("#00c8f0"),
-  donorBorderHi:  new THREE.Color("#00d4ff"),
+  baseLine: new THREE.Color("#1a65c0"), // gradient top
+  baseLineLow: new THREE.Color("#0a2848"), // gradient bottom (darker)
+  glowCyan: new THREE.Color("#38b0f0"), // additive halo over every line
+  donorBorder: new THREE.Color("#00c8f0"),
+  donorBorderHi: new THREE.Color("#00d4ff"),
   donorBorderTop: new THREE.Color("#f0b429"),
-  selectedFill:   new THREE.Color("#0c2d4a"),
-  fillDonor:      new THREE.Color("#071428"),
+  selectedFill: new THREE.Color("#0c2d4a"),
+  fillDonor: new THREE.Color("#071428"),
 };
 
 const M2_PER_UAH = 21.833;
@@ -47,9 +46,12 @@ function donorTier(squareM2: number): "small" | "medium" | "large" {
 }
 
 function tierBorderColor(tier: "small" | "medium" | "large", multiplier = 1) {
-  const c = tier === "large"  ? PALETTE.donorBorderTop.clone().multiplyScalar(5.5)
-          : tier === "medium" ? PALETTE.donorBorderHi.clone().multiplyScalar(6.5)
-          :                     PALETTE.donorBorder.clone().multiplyScalar(4.0);
+  const c =
+    tier === "large"
+      ? PALETTE.donorBorderTop.clone().multiplyScalar(5.5)
+      : tier === "medium"
+        ? PALETTE.donorBorderHi.clone().multiplyScalar(6.5)
+        : PALETTE.donorBorder.clone().multiplyScalar(4.0);
   return c.multiplyScalar(multiplier);
 }
 
@@ -60,7 +62,10 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
      Top 10 positions are computed from the donors array only, so they NEVER
      move when selectedId changes. If a non-top-10 donor is selected, we
      append them as an 11th hex in a deterministic free cell. */
-  const baseMap = useMemo(() => mapTop10ToCells(cells, donors), [cells, donors]);
+  const baseMap = useMemo(
+    () => mapTop10ToCells(cells, donors),
+    [cells, donors],
+  );
 
   const cellToDonor = useMemo(() => {
     if (!selectedId) return baseMap.byCell;
@@ -81,73 +86,82 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
        (3) accent layer — bright additive on ~18% random cells
      Per-cell inset varies 0.65..0.98 so hexes look visibly different sizes.
   */
-  const { bgBorderGeom, bgGlowGeom, bgAccentGeom, donorCellList } = useMemo(() => {
-    const borderPos: number[] = [], borderCol: number[] = [];
-    const glowPos: number[] = [],   glowCol: number[] = [];
-    const accentPos: number[] = [], accentCol: number[] = [];
+  const { bgBorderGeom, bgGlowGeom, bgAccentGeom, donorCellList } =
+    useMemo(() => {
+      const borderPos: number[] = [],
+        borderCol: number[] = [];
+      const glowPos: number[] = [],
+        glowCol: number[] = [];
+      const accentPos: number[] = [],
+        accentCol: number[] = [];
 
-    cells.forEach((cell) => {
-      if (cellToDonor.has(cell.index)) return;
-      const h = cellHash(cell.index);
-      const isAccent = h > 0.82;
-      const baseAlpha = 0.03 + h * 0.14; // very transparent — reads as glass
-      const hueShift = (cellHash(cell.index + 99) - 0.5) * 0.05;
+      cells.forEach((cell) => {
+        if (cellToDonor.has(cell.index)) return;
+        const h = cellHash(cell.index);
+        const isAccent = h > 0.82;
+        const baseAlpha = 0.03 + h * 0.14; // very transparent — reads as glass
+        const hueShift = (cellHash(cell.index + 99) - 0.5) * 0.05;
 
-      // Per-cell inset variation — visibly different hex sizes
-      const inset = 0.65 + cellHash(cell.index + 311) * 0.33;
-      const c = cell.position;
-      const ring = cell.verts.map((p) => new THREE.Vector3(
-        c.x + (p.x - c.x) * inset,
-        c.y + (p.y - c.y) * inset,
-        c.z + (p.z - c.z) * inset,
-      ));
+        // Per-cell inset variation — visibly different hex sizes
+        const inset = 0.65 + cellHash(cell.index + 311) * 0.33;
+        const c = cell.position;
+        const ring = cell.verts.map(
+          (p) =>
+            new THREE.Vector3(
+              c.x + (p.x - c.x) * inset,
+              c.y + (p.y - c.y) * inset,
+              c.z + (p.z - c.z) * inset,
+            ),
+        );
 
-      // Min/max y of ring for the vertical gradient
-      let minY = Infinity, maxY = -Infinity;
-      ring.forEach((p) => { if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; });
-      const yRange = Math.max(0.01, maxY - minY);
+        // Min/max y of ring for the vertical gradient
+        let minY = Infinity,
+          maxY = -Infinity;
+        ring.forEach((p) => {
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        });
+        const yRange = Math.max(0.01, maxY - minY);
 
-      const colAt = (p: THREE.Vector3) => {
-        const t = (p.y - minY) / yRange;
-        const mixed = PALETTE.baseLineLow.clone().lerp(PALETTE.baseLine, t);
-        mixed.offsetHSL(hueShift, 0, 0).multiplyScalar(baseAlpha + t * 0.10);
-        return mixed;
-      };
+        const colAt = (p: THREE.Vector3) => {
+          const t = (p.y - minY) / yRange;
+          const mixed = PALETTE.baseLineLow.clone().lerp(PALETTE.baseLine, t);
+          mixed.offsetHSL(hueShift, 0, 0).multiplyScalar(baseAlpha + t * 0.1);
+          return mixed;
+        };
 
-      for (let j = 0; j < ring.length; j++) {
-        const a = ring[j], b = ring[(j + 1) % ring.length];
-        const ca = colAt(a), cb = colAt(b);
+        for (let j = 0; j < ring.length; j++) {
+          const a = ring[j],
+            b = ring[(j + 1) % ring.length];
+          const ca = colAt(a),
+            cb = colAt(b);
 
-        borderPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
-        borderCol.push(ca.r, ca.g, ca.b, cb.r, cb.g, cb.b);
+          borderPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          borderCol.push(ca.r, ca.g, ca.b, cb.r, cb.g, cb.b);
 
-        const g = PALETTE.glowCyan.clone().multiplyScalar(0.06 + h * 0.16);
-        glowPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
-        glowCol.push(g.r, g.g, g.b, g.r, g.g, g.b);
-
-        if (isAccent) {
-          const ac = PALETTE.accentCyan.clone().multiplyScalar(0.45);
-          accentPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
-          accentCol.push(ac.r, ac.g, ac.b, ac.r, ac.g, ac.b);
+          const g = PALETTE.glowCyan.clone().multiplyScalar(0.06 + h * 0.16);
+          glowPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          glowCol.push(g.r, g.g, g.b, g.r, g.g, g.b);
         }
-      }
-    });
+      });
 
-    const mk = (pos: number[], col: number[]) => {
-      const g = new THREE.BufferGeometry();
-      g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-      g.setAttribute("color",    new THREE.Float32BufferAttribute(col, 3));
-      return g;
-    };
-    const donorCellList: Array<{ cell: DomeCell; donor: DonorData }> = [];
-    cellToDonor.forEach((donor, idx) => donorCellList.push({ cell: cells[idx], donor }));
-    return {
-      bgBorderGeom: mk(borderPos, borderCol),
-      bgGlowGeom:   mk(glowPos, glowCol),
-      bgAccentGeom: mk(accentPos, accentCol),
-      donorCellList,
-    };
-  }, [cells, cellToDonor]);
+      const mk = (pos: number[], col: number[]) => {
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+        g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+        return g;
+      };
+      const donorCellList: Array<{ cell: DomeCell; donor: DonorData }> = [];
+      cellToDonor.forEach((donor, idx) =>
+        donorCellList.push({ cell: cells[idx], donor }),
+      );
+      return {
+        bgBorderGeom: mk(borderPos, borderCol),
+        bgGlowGeom: mk(glowPos, glowCol),
+        bgAccentGeom: mk(accentPos, accentCol),
+        donorCellList,
+      };
+    }, [cells, cellToDonor]);
 
   /* Labels — show ALL donor cells (already capped to ~10–11 by the
      cellToDonor logic above). Selected donor gets a close button overlay. */
@@ -156,13 +170,15 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       key: string;
       pos: [number, number, number];
       anchorPos: [number, number, number];
-      name: string; area: string;
+      name: string;
+      area: string;
       selected: boolean;
     }> = [];
     cellToDonor.forEach((donor, idx) => {
       const c = cells[idx];
       const anchor = c.position.clone().addScaledVector(c.normal, 0.02);
-      const label = c.position.clone()
+      const label = c.position
+        .clone()
         .addScaledVector(c.normal, 0.22)
         .add(new THREE.Vector3(0, 0.12, 0));
       out.push({
@@ -182,15 +198,24 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       {/* Background hex network — 3 merged draw calls */}
       <lineSegments>
         <primitive object={bgBorderGeom} attach="geometry" />
-        <lineBasicMaterial vertexColors transparent opacity={1} toneMapped={false} />
+        <lineBasicMaterial
+          vertexColors
+          transparent
+          opacity={1}
+          toneMapped={false}
+        />
       </lineSegments>
 
       {/* Additive halo on every border — gives the "glowing edge" look */}
       <lineSegments>
         <primitive object={bgGlowGeom} attach="geometry" />
         <lineBasicMaterial
-          vertexColors transparent opacity={1}
-          blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false}
+          vertexColors
+          transparent
+          opacity={1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
         />
       </lineSegments>
 
@@ -198,8 +223,12 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
       <lineSegments>
         <primitive object={bgAccentGeom} attach="geometry" />
         <lineBasicMaterial
-          vertexColors transparent opacity={1}
-          blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false}
+          vertexColors
+          transparent
+          opacity={1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
         />
       </lineSegments>
 
@@ -276,7 +305,8 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
                     marginTop: 1,
                     color: label.selected ? "#ffe49a" : "#9fe9ff",
                     letterSpacing: "0.06em",
-                    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, Menlo, monospace",
                     fontWeight: 500,
                   }}
                 >
@@ -300,7 +330,8 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: 22, height: 22,
+                  width: 22,
+                  height: 22,
                   marginLeft: 4,
                   borderRadius: 999,
                   background: "rgba(240,180,41,0.18)",
@@ -342,7 +373,11 @@ export function HexCells({ donors, selectedId, onSelect }: Props) {
    Uses side: FrontSide so clicks on the BACK of the dome are ignored.
    ───────────────────────────────────────────── */
 function DonorHex({
-  cell, donor, selected, dimmed, onSelect,
+  cell,
+  donor,
+  selected,
+  dimmed,
+  onSelect,
 }: {
   cell: DomeCell;
   donor: DonorData;
@@ -357,29 +392,40 @@ function DonorHex({
   const tier = donorTier(donor.squareM2);
 
   const { fillGeom, outlineGeom, glowOutlineGeom, ringGeom } = useMemo(() => {
-    const inset = 0.90;
+    const inset = 0.9;
     const c = cell.position;
-    const ring = cell.verts.map((p) => new THREE.Vector3(
-      c.x + (p.x - c.x) * inset,
-      c.y + (p.y - c.y) * inset,
-      c.z + (p.z - c.z) * inset,
-    ));
+    const ring = cell.verts.map(
+      (p) =>
+        new THREE.Vector3(
+          c.x + (p.x - c.x) * inset,
+          c.y + (p.y - c.y) * inset,
+          c.z + (p.z - c.z) * inset,
+        ),
+    );
     const fillPos: number[] = [];
     for (let i = 0; i < ring.length; i++) {
-      const a = ring[i], b = ring[(i + 1) % ring.length];
+      const a = ring[i],
+        b = ring[(i + 1) % ring.length];
       fillPos.push(c.x, c.y, c.z, a.x, a.y, a.z, b.x, b.y, b.z);
     }
     const fillG = new THREE.BufferGeometry();
-    fillG.setAttribute("position", new THREE.Float32BufferAttribute(fillPos, 3));
+    fillG.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(fillPos, 3),
+    );
     fillG.computeVertexNormals();
 
     const outlinePos: number[] = [];
     for (let i = 0; i < ring.length; i++) {
-      const a = ring[i], b = ring[(i + 1) % ring.length];
+      const a = ring[i],
+        b = ring[(i + 1) % ring.length];
       outlinePos.push(a.x, a.y, a.z, b.x, b.y, b.z);
     }
     const outlineG = new THREE.BufferGeometry();
-    outlineG.setAttribute("position", new THREE.Float32BufferAttribute(outlinePos, 3));
+    outlineG.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(outlinePos, 3),
+    );
 
     // Glow outline = same geometry, drawn additively as a 2nd pass
     const glowOutlineG = outlineG.clone();
@@ -387,19 +433,31 @@ function DonorHex({
     // Halo ring — 6% larger contour for ambient "this is clickable" glow
     const ringPos: number[] = [];
     const ringInset = 1.05; // outside the actual outline
-    const ringPoints = cell.verts.map((p) => new THREE.Vector3(
-      c.x + (p.x - c.x) * inset * ringInset,
-      c.y + (p.y - c.y) * inset * ringInset,
-      c.z + (p.z - c.z) * inset * ringInset,
-    ));
+    const ringPoints = cell.verts.map(
+      (p) =>
+        new THREE.Vector3(
+          c.x + (p.x - c.x) * inset * ringInset,
+          c.y + (p.y - c.y) * inset * ringInset,
+          c.z + (p.z - c.z) * inset * ringInset,
+        ),
+    );
     for (let i = 0; i < ringPoints.length; i++) {
-      const a = ringPoints[i], b = ringPoints[(i + 1) % ringPoints.length];
+      const a = ringPoints[i],
+        b = ringPoints[(i + 1) % ringPoints.length];
       ringPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
     }
     const ringG = new THREE.BufferGeometry();
-    ringG.setAttribute("position", new THREE.Float32BufferAttribute(ringPos, 3));
+    ringG.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(ringPos, 3),
+    );
 
-    return { fillGeom: fillG, outlineGeom: outlineG, glowOutlineGeom: glowOutlineG, ringGeom: ringG };
+    return {
+      fillGeom: fillG,
+      outlineGeom: outlineG,
+      glowOutlineGeom: glowOutlineG,
+      ringGeom: ringG,
+    };
   }, [cell]);
 
   /* Discrete BLINK on selected + ambient breathing halo on un-selected */
@@ -407,28 +465,36 @@ function DonorHex({
     if (!fillMatRef.current || !lineMatRef.current) return;
     const k = Math.min(1, dt * 12);
     // Blink: 380ms on, 220ms off
-    const blinkOn = selected ? (performance.now() % 600) < 380 : false;
+    const blinkOn = selected ? performance.now() % 600 < 380 : false;
     // Ambient breathe for the halo so donor hexes are visibly clickable
     const ambient = 0.45 + Math.sin(performance.now() * 0.0025) * 0.18;
 
     const targetFillOp = selected
-      ? (blinkOn ? 0.55 : 0.12)
-      : dimmed ? 0.05 : 0.18;
-    fillMatRef.current.opacity += (targetFillOp - fillMatRef.current.opacity) * k;
+      ? blinkOn
+        ? 0.55
+        : 0.12
+      : dimmed
+        ? 0.05
+        : 0.18;
+    fillMatRef.current.opacity +=
+      (targetFillOp - fillMatRef.current.opacity) * k;
 
     const targetLineOp = selected
-      ? (blinkOn ? 1.0 : 0.35)
-      : dimmed ? 0.45 : 0.95;
-    lineMatRef.current.opacity += (targetLineOp - lineMatRef.current.opacity) * k;
+      ? blinkOn
+        ? 1.0
+        : 0.35
+      : dimmed
+        ? 0.45
+        : 0.95;
+    lineMatRef.current.opacity +=
+      (targetLineOp - lineMatRef.current.opacity) * k;
 
     if (glowMatRef.current) {
       const t = selected ? (blinkOn ? 0.9 : 0.25) : dimmed ? 0.15 : 0.55;
       glowMatRef.current.opacity += (t - glowMatRef.current.opacity) * k;
     }
     if (ringMatRef.current) {
-      const t = selected
-        ? (blinkOn ? 0.85 : 0.35)
-        : dimmed ? 0.10 : ambient;
+      const t = selected ? (blinkOn ? 0.85 : 0.35) : dimmed ? 0.1 : ambient;
       ringMatRef.current.opacity += (t - ringMatRef.current.opacity) * k;
     }
 
@@ -445,7 +511,9 @@ function DonorHex({
     e.stopPropagation();
     document.body.style.cursor = "pointer";
   };
-  const handlePointerOut = () => { document.body.style.cursor = ""; };
+  const handlePointerOut = () => {
+    document.body.style.cursor = "";
+  };
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     onSelect(selected ? null : donor.id);
@@ -466,7 +534,7 @@ function DonorHex({
           opacity={0.16}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
-          side={THREE.FrontSide}     /* BLOCKS clicks through the dome */
+          side={THREE.FrontSide} /* BLOCKS clicks through the dome */
           toneMapped={false}
         />
       </mesh>

@@ -14,8 +14,8 @@ import {
 } from "./hexUtils";
 
 const R = DOME_RADIUS;
-const AUTO_ROTATE_SPEED = 0.025;     // slow — ~4 min per revolution
-const MANUAL_RESUME_MS  = 1200;       // after how long auto-rotate resumes post-drag
+const AUTO_ROTATE_SPEED = 0.025; // slow — ~4 min per revolution
+const MANUAL_RESUME_MS = 1200; // after how long auto-rotate resumes post-drag
 
 interface Props {
   donors: DonorData[];
@@ -89,7 +89,7 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
       dragVelX.current = 0;
       manualOverride.current = performance.now();
       el.setPointerCapture(e.pointerId);
-      rotTween.current?.kill();          // drag cancels rotation tween
+      rotTween.current?.kill(); // drag cancels rotation tween
     };
     const move = (e: PointerEvent) => {
       if (!isDragging.current || !domeRef.current) return;
@@ -102,7 +102,11 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
     const up = (e: PointerEvent) => {
       if (!isDragging.current) return;
       isDragging.current = false;
-      try { el.releasePointerCapture(e.pointerId); } catch { /* noop */ }
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        /* noop */
+      }
     };
 
     el.addEventListener("pointerdown", down);
@@ -120,7 +124,10 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
   /* Compute the SAME cell mapping HexCells uses (memoised at module scope
      via WeakMap on the donors array, so both calls share one result). */
   const cells = useMemo(() => generateDomeCells(R), []);
-  const baseMap = useMemo(() => mapTop10ToCells(cells, donors), [cells, donors]);
+  const baseMap = useMemo(
+    () => mapTop10ToCells(cells, donors),
+    [cells, donors],
+  );
 
   /* ── Selection → rotate + zoom-in camera ── */
   useEffect(() => {
@@ -131,8 +138,11 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
     if (!selectedId) {
       focusedCell.current = null;
       camTween.current = gsap.to(camera.position, {
-        x: BASE_CAM.current.x, y: BASE_CAM.current.y, z: BASE_CAM.current.z,
-        duration: 0.9, ease: "power3.out",
+        x: BASE_CAM.current.x,
+        y: BASE_CAM.current.y,
+        z: BASE_CAM.current.z,
+        duration: 0.9,
+        ease: "power3.out",
         onUpdate: () => camera.lookAt(BASE_LOOK.current),
       });
       return;
@@ -143,17 +153,20 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
 
     // Locate the donor's cell — same logic as HexCells.tsx
     let cellIndex = baseMap.byDonor.get(donor.id);
-    if (cellIndex == null) cellIndex = pickExtraCellFor(cells, baseMap, donor) ?? undefined;
+    if (cellIndex == null)
+      cellIndex = pickExtraCellFor(cells, baseMap, donor) ?? undefined;
     if (cellIndex == null) return;
     const cell = cells[cellIndex];
 
     /* Rotate dome so the hex faces front */
     const current = domeRef.current.rotation.y;
     let target = -cell.theta;
-    while (target - current >  Math.PI) target -= Math.PI * 2;
+    while (target - current > Math.PI) target -= Math.PI * 2;
     while (target - current < -Math.PI) target += Math.PI * 2;
     rotTween.current = gsap.to(domeRef.current.rotation, {
-      y: target, duration: 1.1, ease: "power3.out",
+      y: target,
+      duration: 1.1,
+      ease: "power3.out",
     });
 
     /* Camera dolly along the hex's outward normal (straight-on, not from the side) */
@@ -172,8 +185,11 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
     focusedCell.current = cell.position.clone();
 
     camTween.current = gsap.to(camera.position, {
-      x: camTarget.x, y: camTarget.y, z: camTarget.z,
-      duration: 1.1, ease: "power3.out",
+      x: camTarget.x,
+      y: camTarget.y,
+      z: camTarget.z,
+      duration: 1.1,
+      ease: "power3.out",
     });
   }, [selectedId, donors, baseMap, cells, camera]);
 
@@ -209,27 +225,49 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
 
   const outerRim = useRef<THREE.ShaderMaterial | null>(null);
   const innerRim = useRef<THREE.ShaderMaterial | null>(null);
-  if (!outerRim.current) outerRim.current = makeRimMaterial(0x00c8f0, 0.34);
-  if (!innerRim.current) innerRim.current = makeRimMaterial(0x88e5ff, 0.14);
+  if (!outerRim.current) outerRim.current = makeRimMaterial(0x00c8f0, 0);
+  if (!innerRim.current) innerRim.current = makeRimMaterial(0x88e5ff, 0);
 
   return (
     <>
       {/* Lighting — pure cyan/blue */}
       <ambientLight color="#0a1f3a" intensity={4} />
-      <pointLight position={[0, R * 2.5, 0]}   color="#00d4ff" intensity={45} distance={R * 8} decay={2} />
-      <pointLight position={[R * 0.8, R * 0.8, R * 1.8]}  color="#38b0f0" intensity={14} distance={R * 6} decay={2} />
-      <pointLight position={[-R * 0.8, R * 0.3, -R * 1.5]} color="#1a65c0" intensity={10} distance={R * 5} decay={2} />
+      <pointLight
+        position={[0, R * 2.5, 0]}
+        color="#00d4ff"
+        intensity={45}
+        distance={R * 8}
+        decay={2}
+      />
+      <pointLight
+        position={[R * 0.8, R * 0.8, R * 1.8]}
+        color="#38b0f0"
+        intensity={14}
+        distance={R * 6}
+        decay={2}
+      />
+      <pointLight
+        position={[-R * 0.8, R * 0.3, -R * 1.5]}
+        color="#1a65c0"
+        intensity={10}
+        distance={R * 5}
+        decay={2}
+      />
 
       <group ref={domeRef}>
         {/* Outer fresnel halo */}
         <mesh>
-          <sphereGeometry args={[R * 1.06, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2 + 0.05]} />
+          <sphereGeometry
+            args={[R * 1.06, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2 + 0.05]}
+          />
           <primitive object={outerRim.current} attach="material" />
         </mesh>
 
         {/* Inner soft glow */}
         <mesh>
-          <sphereGeometry args={[R * 0.94, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2 + 0.05]} />
+          <sphereGeometry
+            args={[R * 0.94, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2 + 0.05]}
+          />
           <primitive object={innerRim.current} attach="material" />
         </mesh>
 
@@ -237,9 +275,13 @@ export function DomeScene({ donors, selectedId, onSelect }: Props) {
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[R * 0.998, R * 1.014, 128]} />
           <meshBasicMaterial
-            color="#00c8f0" transparent opacity={0.7}
-            blending={THREE.AdditiveBlending} depthWrite={false}
-            side={THREE.DoubleSide} toneMapped={false}
+            color="#00c8f0"
+            transparent
+            opacity={0.7}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+            toneMapped={false}
           />
         </mesh>
 

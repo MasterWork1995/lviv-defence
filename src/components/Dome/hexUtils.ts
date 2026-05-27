@@ -34,7 +34,7 @@ export interface DonorData {
   sector: number | null;
 }
 
-export const DOME_RADIUS = 3.4;     // bigger — fills hero width
+export const DOME_RADIUS = 4.5; // bigger — fills hero width
 const SUBDIVISION = 3;
 
 let CELLS_CACHE: DomeCell[] | null = null;
@@ -61,7 +61,7 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
   };
   for (let i = 0; i < arr.length; i += 9) {
     tris.push([
-      vid(arr[i],     arr[i + 1], arr[i + 2]),
+      vid(arr[i], arr[i + 1], arr[i + 2]),
       vid(arr[i + 3], arr[i + 4], arr[i + 5]),
       vid(arr[i + 6], arr[i + 7], arr[i + 8]),
     ]);
@@ -90,27 +90,38 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
 
     const boundary = triList.map((ti) => {
       const [a, b, c] = tris[ti];
-      const x = (verts[a * 3]     + verts[b * 3]     + verts[c * 3])     / 3;
+      const x = (verts[a * 3] + verts[b * 3] + verts[c * 3]) / 3;
       const y = (verts[a * 3 + 1] + verts[b * 3 + 1] + verts[c * 3 + 1]) / 3;
       const z = (verts[a * 3 + 2] + verts[b * 3 + 2] + verts[c * 3 + 2]) / 3;
       const k = radius / Math.hypot(x, y, z);
       return new THREE.Vector3(x * k, y * k, z * k);
     });
 
-    const u = (Math.abs(normal.y) < 0.99
-      ? new THREE.Vector3(0, 1, 0)
-      : new THREE.Vector3(1, 0, 0)
-    ).cross(normal).normalize();
+    const u = (
+      Math.abs(normal.y) < 0.99
+        ? new THREE.Vector3(0, 1, 0)
+        : new THREE.Vector3(1, 0, 0)
+    )
+      .cross(normal)
+      .normalize();
     const v = new THREE.Vector3().crossVectors(normal, u);
     boundary.sort((A, B) => {
-      const a1 = Math.atan2(A.clone().sub(position).dot(v), A.clone().sub(position).dot(u));
-      const a2 = Math.atan2(B.clone().sub(position).dot(v), B.clone().sub(position).dot(u));
+      const a1 = Math.atan2(
+        A.clone().sub(position).dot(v),
+        A.clone().sub(position).dot(u),
+      );
+      const a2 = Math.atan2(
+        B.clone().sub(position).dot(v),
+        B.clone().sub(position).dot(u),
+      );
       return a1 - a2;
     });
 
     out.push({
       index: 0,
-      position, normal, verts: boundary,
+      position,
+      normal,
+      verts: boundary,
       isPent: boundary.length === 5,
       theta: Math.atan2(cx, cz),
       ringIndex: Math.round((1 - cy / radius) * 4),
@@ -118,14 +129,19 @@ export function generateDomeCells(radius = DOME_RADIUS): DomeCell[] {
   });
 
   const upper = out.filter((f) => f.position.y > -0.05 * radius);
-  upper.forEach((c, i) => { c.index = i; });
+  upper.forEach((c, i) => {
+    c.index = i;
+  });
 
   CELLS_CACHE = upper;
   return upper;
 }
 
 /* Donor → cell assignment: spread evenly across azimuth, skip pentagons. */
-export function pickDonorCells(cells: DomeCell[], donorCount: number): number[] {
+export function pickDonorCells(
+  cells: DomeCell[],
+  donorCount: number,
+): number[] {
   const targets: { theta: number; phi: number }[] = [];
   for (let i = 0; i < donorCount; i++) {
     const t = (i + 0.5) / donorCount;
@@ -143,9 +159,14 @@ export function pickDonorCells(cells: DomeCell[], donorCount: number): number[] 
     let bestD = Infinity;
     cells.forEach((c, i) => {
       if (used.has(i) || c.isPent) return;
-      const dx = c.normal.x - tx, dy = c.normal.y - ty, dz = c.normal.z - tz;
+      const dx = c.normal.x - tx,
+        dy = c.normal.y - ty,
+        dz = c.normal.z - tz;
       const d = dx * dx + dy * dy + dz * dz;
-      if (d < bestD) { bestD = d; best = i; }
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
     });
     if (best >= 0) used.add(best);
     return best;
@@ -193,7 +214,11 @@ export function mapTop10ToCells(
   const reserved = new Set<number>();
   const claimed = new Set<string>();
   top10.forEach((d) => {
-    if (d.sector != null && d.sector < cells.length && !cells[d.sector].isPent) {
+    if (
+      d.sector != null &&
+      d.sector < cells.length &&
+      !cells[d.sector].isPent
+    ) {
       reserved.add(d.sector);
       byCell.set(d.sector, d);
       byDonor.set(d.id, d.sector);
@@ -225,13 +250,15 @@ export function pickExtraCellFor(
   donor: DonorData,
 ): number | null {
   if (baseMap.byDonor.has(donor.id)) return baseMap.byDonor.get(donor.id)!;
-  if (donor.sector != null && donor.sector < cells.length && !cells[donor.sector].isPent
-      && !baseMap.byCell.has(donor.sector)) {
+  if (
+    donor.sector != null &&
+    donor.sector < cells.length &&
+    !cells[donor.sector].isPent &&
+    !baseMap.byCell.has(donor.sector)
+  ) {
     return donor.sector;
   }
-  const free = cells.filter(
-    (c) => !c.isPent && !baseMap.byCell.has(c.index),
-  );
+  const free = cells.filter((c) => !c.isPent && !baseMap.byCell.has(c.index));
   if (free.length === 0) return null;
   // hash donor.id → stable index
   let h = 2166136261;
