@@ -119,7 +119,8 @@
     "selectLiqpay": "Select LiqPay",
     "dialogLabel": "Donation form",
     "errorMinAmount": "Minimum amount is 1 ₴",
-    "errorName": "Enter a name or select 'Anonymous'"
+    "errorName": "Enter a name or select 'Anonymous'",
+    "nameDuplicateWarning": "Donor «{name}» already exists ({amount}). The new amount will be added to the existing record."
   },
   "donationCard": {
     "title": "Your cell",

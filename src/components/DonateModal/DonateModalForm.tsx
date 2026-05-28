@@ -34,6 +34,7 @@ export const DonateModalForm = ({
     loading,
     error,
     clearError,
+    nameExists,
     activeUah,
     areaPreview,
     handleCustomChange,
@@ -193,6 +194,26 @@ export const DonateModalForm = ({
           </PaymentProviderButton>
         </div>
       </fieldset>
+
+      {/* Duplicate name warning */}
+      <AnimatePresence>
+        {nameExists && (
+          <motion.p
+            key="name-warning"
+            role="alert"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="rounded-lg border border-yellow-400/30 bg-yellow-400/10 px-3 py-2 text-center text-[11px] text-yellow-300 backdrop-blur-sm"
+          >
+            {t("donateModal.nameDuplicateWarning", {
+              name: name.trim(),
+              amount: formatUah(nameExists.totalAmount, locale),
+            })}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       {/* Error */}
       <AnimatePresence mode="wait">

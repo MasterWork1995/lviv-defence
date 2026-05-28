@@ -22,7 +22,7 @@ model Donation {
 
 model Expense {
   id          String   @id @default(cuid())
-  amount      Int      // сума в копійках
+  amount      Int      // сума в грн
   description String
   category    String   // equipment | services | other
   createdAt   DateTime @default(now())

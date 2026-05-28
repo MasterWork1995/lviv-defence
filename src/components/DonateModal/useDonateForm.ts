@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { DonateApiResponse, PaymentProvider } from "./types";
 import { formatArea } from "./utils";
@@ -17,10 +17,27 @@ export const useDonateForm = ({ m2PerUah }: UseDonateFormOptions) => {
   const [provider, setProvider] = useState<PaymentProvider>("monobank");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [nameExists, setNameExists] = useState<{ totalAmount: number } | null>(null);
 
   const liqpayFormRef = useRef<HTMLFormElement>(null);
   const liqpayDataRef = useRef<HTMLInputElement>(null);
   const liqpaySigRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setNameExists(null);
+    const trimmed = name.trim();
+    if (trimmed.length < 2) return;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/donations/check-name?name=${encodeURIComponent(trimmed)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) setNameExists({ totalAmount: data.totalAmount });
+        }
+      } catch {}
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [name]);
 
   const activeUah = preset ?? (customStr ? parseInt(customStr, 10) : 0);
   const areaPreview =
@@ -117,6 +134,7 @@ export const useDonateForm = ({ m2PerUah }: UseDonateFormOptions) => {
     loading,
     error,
     clearError: () => setError(""),
+    nameExists,
     activeUah,
     areaPreview,
     handleCustomChange,

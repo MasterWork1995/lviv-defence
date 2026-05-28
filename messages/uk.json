@@ -119,7 +119,8 @@
     "selectLiqpay": "Оберіть LiqPay",
     "dialogLabel": "Форма донату",
     "errorMinAmount": "Мінімальна сума — 1 ₴",
-    "errorName": "Вкажіть ім'я або оберіть «Анонімно»"
+    "errorName": "Вкажіть ім'я або оберіть «Анонімно»",
+    "nameDuplicateWarning": "Донор «{name}» вже є у базі ({amount}). Нова сума буде додана до існуючого запису."
   },
   "donationCard": {
     "title": "Ваша сота",

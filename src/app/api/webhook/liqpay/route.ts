@@ -61,7 +61,19 @@ export async function POST(req: NextRequest) {
   try {
     if (SUCCESS_STATUSES.has(status)) {
       await prisma.$transaction(async (tx) => {
-        await tx.donation.update({ where: { id: donation.id }, data: { status: "paid" } });
+        const existing = await tx.donation.findFirst({
+          where: { name: { equals: donation.name, mode: "insensitive" }, status: "paid" },
+          orderBy: { createdAt: "asc" },
+        });
+        if (existing) {
+          await tx.donation.update({
+            where: { id: existing.id },
+            data: { amount: existing.amount + donation.amount, squareM2: existing.squareM2 + donation.squareM2 },
+          });
+          await tx.donation.delete({ where: { id: donation.id } });
+        } else {
+          await tx.donation.update({ where: { id: donation.id }, data: { status: "paid" } });
+        }
         const setting = await tx.setting.findUnique({ where: { key: "collected_uah" } });
         const current = parseInt(setting?.value ?? "0", 10);
         await tx.setting.upsert({
