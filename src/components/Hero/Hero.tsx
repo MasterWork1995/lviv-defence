@@ -4,9 +4,9 @@ import { DomeCanvas } from "@/components/Dome/DomeDynamic";
 import { SearchPanel } from "@/components/SearchPanel";
 
 const VIGNETTE =
-  "linear-gradient(to bottom, rgba(4,9,26,0.92) 0%, rgba(4,9,26,0.55) 28%, rgba(4,9,26,0.72) 65%, rgba(4,9,26,0.95) 100%)";
+  "linear-gradient(to bottom, var(--color-excadra-92) 0%, var(--color-excadra-55) 28%, var(--color-excadra-72) 65%, var(--color-excadra-95) 100%)";
 const RADIAL =
-  "radial-gradient(ellipse 70% 55% at 38% 60%, rgba(0,200,240,0.15) 0%, transparent 70%)";
+  "radial-gradient(ellipse 70% 55% at 38% 60%, var(--color-gold-15) 0%, transparent 70%)";
 
 export const Hero = () => {
   const t = useTranslations();
@@ -18,7 +18,7 @@ export const Hero = () => {
         <div className="relative z-0 shrink-0 basis-[clamp(200px,36vh,340px)] overflow-hidden md:basis-[50vh] md:min-h-[50vh] md:max-h-[62vh] lg:basis-[52vh] lg:min-h-[50vh] lg:max-h-[60vh]">
           <div className="absolute inset-0 overflow-hidden">
             <Image
-              src="/Lviv.jpeg"
+              src="/assets/Lviv.jpeg"
               alt="Нічний Львів"
               fill
               priority
@@ -40,7 +40,7 @@ export const Hero = () => {
           </div>
         </div>
 
-        <div className="relative z-10 flex min-h-0 flex-1 flex-col border-t border-primary/10 bg-bg shadow-[0_-12px_40px_rgba(4,9,26,0.85)]">
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col border-t border-primary/10 bg-bg shadow-[0_-12px_40px_var(--color-excadra-85)]">
           <SearchPanel />
         </div>
       </div>
@@ -48,7 +48,7 @@ export const Hero = () => {
       <div className="absolute inset-0 hidden xl:flex">
         {/* Full-section background */}
         <Image
-          src="/Lviv.jpeg"
+          src="/assets/Lviv.jpeg"
           alt="Нічний Львів"
           fill
           priority

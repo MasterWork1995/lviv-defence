@@ -8,7 +8,7 @@ export const panelSubLabel =
   "font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-text-muted lg:text-[10px]";
 
 export const panelInput =
-  "flex items-center gap-2 rounded-lg border border-border/60 bg-surface-2/50 px-3 py-2.5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_2px_rgba(0,200,240,0.12)]";
+  "flex items-center gap-2 rounded-lg border border-border/60 bg-surface-2/50 px-3 py-2.5 transition-all focus-within:border-primary/50 focus-within:shadow-[0_0_0_2px_var(--color-gold-12)]";
 
 export const panelGhostButton =
   "cursor-pointer font-mono text-[9px] uppercase tracking-[0.12em] text-text-muted transition-colors hover:text-primary";

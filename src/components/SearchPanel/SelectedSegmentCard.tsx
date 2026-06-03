@@ -46,7 +46,7 @@ export const SelectedSegmentCard = ({ selected }: SelectedSegmentCardProps) => {
             <div className="min-w-0 flex-1">
               <div
                 className="mb-2 flex h-9 w-10 items-center justify-center"
-                style={{ filter: "drop-shadow(0 0 6px rgba(0,200,240,0.4))" }}
+                style={{ filter: "drop-shadow(0 0 6px var(--color-gold-45))" }}
               >
                 <HexIcon className="h-9 w-9 text-primary" />
               </div>

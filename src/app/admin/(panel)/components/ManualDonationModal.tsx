@@ -31,7 +31,9 @@ export function ManualDonationModal({
   const [m2PerUah, setM2PerUah] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [nameExists, setNameExists] = useState<{ totalAmount: number } | null>(null);
+  const [nameExists, setNameExists] = useState<{ totalAmount: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     adminFetch("/api/admin/settings")
@@ -50,7 +52,9 @@ export function ManualDonationModal({
     if (trimmed.length < 2) return;
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/donations/check-name?name=${encodeURIComponent(trimmed)}`);
+        const res = await fetch(
+          `/api/donations/check-name?name=${encodeURIComponent(trimmed)}`,
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.exists) setNameExists({ totalAmount: data.totalAmount });
@@ -61,7 +65,8 @@ export function ManualDonationModal({
   }, [name]);
 
   const amountNum = parseFloat(amount) || 0;
-  const previewM2 = m2PerUah !== null && amountNum > 0 ? amountNum * m2PerUah : null;
+  const previewM2 =
+    m2PerUah !== null && amountNum > 0 ? amountNum * m2PerUah : null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,10 +113,21 @@ export function ManualDonationModal({
         {previewM2 !== null && (
           <div
             className="flex items-center justify-between rounded-lg px-3 py-2.5"
-            style={{ background: "var(--color-surface-2)", border: "1px solid var(--color-border)" }}
+            style={{
+              background: "var(--color-surface-2)",
+              border: "1px solid var(--color-border)",
+            }}
           >
-            <span className="text-sm" style={{ color: "var(--color-text-muted)" }}>Площа куполу</span>
-            <span className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>
+            <span
+              className="text-sm"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              Площа куполу
+            </span>
+            <span
+              className="text-sm font-medium"
+              style={{ color: "var(--color-primary)" }}
+            >
               {fmtM2(previewM2)}
             </span>
           </div>
@@ -120,14 +136,21 @@ export function ManualDonationModal({
         {nameExists && (
           <p
             className="text-sm rounded-lg px-3 py-2.5 border"
-            style={{ background: "#422006", borderColor: "#854d0e", color: "#fde68a" }}
+            style={{
+              background: "var(--color-primary-deep)",
+              borderColor: "var(--color-primary-shadow)",
+              color: "var(--color-primary-soft)",
+            }}
           >
-            Донор «{name.trim()}» вже є у базі ({fmtUah(nameExists.totalAmount)}). Сума буде додана до існуючого запису.
+            Донор «{name.trim()}» вже є у базі ({fmtUah(nameExists.totalAmount)}
+            ). Сума буде додана до існуючого запису.
           </p>
         )}
 
         {error && (
-          <p className="text-sm" style={{ color: "var(--color-error)" }}>{error}</p>
+          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+            {error}
+          </p>
         )}
 
         <div className="flex gap-3 mt-2">
@@ -135,7 +158,10 @@ export function ManualDonationModal({
             type="button"
             onClick={onClose}
             className="flex-1 py-2 rounded-lg text-sm border"
-            style={{ borderColor: "var(--color-border)", color: "var(--color-text-dim)" }}
+            style={{
+              borderColor: "var(--color-border)",
+              color: "var(--color-text-dim)",
+            }}
           >
             Скасувати
           </button>
@@ -143,7 +169,10 @@ export function ManualDonationModal({
             type="submit"
             disabled={loading}
             className="flex-1 py-2 rounded-lg text-sm font-medium disabled:opacity-60"
-            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+            style={{
+              background: "var(--color-primary)",
+              color: "var(--color-bg)",
+            }}
           >
             {loading ? "Збереження..." : "Зберегти"}
           </button>

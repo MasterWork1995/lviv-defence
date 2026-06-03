@@ -20,14 +20,20 @@ export function ConfirmModal({
         <button
           onClick={onCancel}
           className="flex-1 py-2 rounded-lg text-sm border"
-          style={{ borderColor: "var(--color-border)", color: "var(--color-text-dim)" }}
+          style={{
+            borderColor: "var(--color-border)",
+            color: "var(--color-text-dim)",
+          }}
         >
           Скасувати
         </button>
         <button
           onClick={onConfirm}
           className="flex-1 py-2 rounded-lg text-sm font-medium"
-          style={{ background: "var(--color-error)", color: "#fff" }}
+          style={{
+            background: "var(--color-error)",
+            color: "var(--color-white)",
+          }}
         >
           Видалити
         </button>

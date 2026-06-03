@@ -82,9 +82,7 @@ export function DomeScene({
     () => getDomeCameraSettings(R, viewport),
     [viewport],
   );
-  const BASE_CAM = useRef(
-    new THREE.Vector3(...camSettings.position),
-  );
+  const BASE_CAM = useRef(new THREE.Vector3(...camSettings.position));
   const BASE_LOOK = useRef(new THREE.Vector3(...camSettings.lookAt));
 
   useEffect(() => {
@@ -245,30 +243,31 @@ export function DomeScene({
 
   const outerRim = useRef<THREE.ShaderMaterial | null>(null);
   const innerRim = useRef<THREE.ShaderMaterial | null>(null);
-  if (!outerRim.current) outerRim.current = makeRimMaterial(0x00c8f0, 0);
-  if (!innerRim.current) innerRim.current = makeRimMaterial(0x88e5ff, 0);
+  // Rim colours sourced from design tokens: --color-accent-glow + --color-accent-hover
+  if (!outerRim.current) outerRim.current = makeRimMaterial(0xcad3e8, 0);
+  if (!innerRim.current) innerRim.current = makeRimMaterial(0x7e8aa8, 0);
 
   return (
     <>
-      {/* Lighting — pure cyan/blue */}
-      <ambientLight color="#0a1f3a" intensity={4} />
+      {/* Lighting — cool storm-sky moonlight, all hexes derived from design tokens */}
+      <ambientLight color="#1a2342" intensity={4} />
       <pointLight
         position={[0, R * 2.5, 0]}
-        color="#00d4ff"
+        color="#cad3e8"
         intensity={45}
         distance={R * 8}
         decay={2}
       />
       <pointLight
         position={[R * 0.8, R * 0.8, R * 1.8]}
-        color="#38b0f0"
+        color="#7e8aa8"
         intensity={14}
         distance={R * 6}
         decay={2}
       />
       <pointLight
         position={[-R * 0.8, R * 0.3, -R * 1.5]}
-        color="#1a65c0"
+        color="#3d4866"
         intensity={10}
         distance={R * 5}
         decay={2}
@@ -291,11 +290,11 @@ export function DomeScene({
           <primitive object={innerRim.current} attach="material" />
         </mesh>
 
-        {/* Base ring on the ground line */}
+        {/* Base ring on the ground line — gold shield base */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[R * 0.998, R * 1.014, 128]} />
           <meshBasicMaterial
-            color="#00c8f0"
+            color="#f39200"
             transparent
             opacity={0.7}
             blending={THREE.AdditiveBlending}
@@ -308,7 +307,7 @@ export function DomeScene({
         {/* Apex glint */}
         <mesh position={[0, R * 0.997, 0]}>
           <sphereGeometry args={[0.024, 8, 8]} />
-          <meshBasicMaterial color="#9fe9ff" toneMapped={false} />
+          <meshBasicMaterial color="#ffffff" toneMapped={false} />
         </mesh>
 
         {/* Hex network */}

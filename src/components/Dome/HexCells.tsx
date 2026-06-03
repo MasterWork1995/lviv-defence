@@ -24,19 +24,13 @@ interface Props {
   viewport?: DomeViewport;
 }
 
-/* ─────────────────────────────────────────────
-   Palette — cyan/blue family. Borders render as a per-vertex gradient
-   (top-of-hex bright, bottom-of-hex dim) for a more "glass shield" look.
-   ───────────────────────────────────────────── */
 const PALETTE = {
-  baseLine: new THREE.Color("#1a65c0"), // gradient top
-  baseLineLow: new THREE.Color("#0a2848"), // gradient bottom (darker)
-  glowCyan: new THREE.Color("#38b0f0"), // additive halo over every line
-  donorBorder: new THREE.Color("#00c8f0"),
-  donorBorderHi: new THREE.Color("#00d4ff"),
-  donorBorderTop: new THREE.Color("#f0b429"),
-  selectedFill: new THREE.Color("#0c2d4a"),
-  fillDonor: new THREE.Color("#071428"),
+  baseLine: new THREE.Color("#58627d"),
+  baseLineLow: new THREE.Color("#111224"),
+  glowCyan: new THREE.Color("#cad3e8"),
+  donorBorder: new THREE.Color("#f39200"),
+  selectedFill: new THREE.Color("#1c2238"),
+  fillDonor: new THREE.Color("#161a2c"),
 };
 
 const M2_PER_UAH = 21.833;
@@ -48,14 +42,9 @@ function donorTier(squareM2: number): "small" | "medium" | "large" {
   return "small";
 }
 
-function tierBorderColor(tier: "small" | "medium" | "large", multiplier = 1) {
-  const c =
-    tier === "large"
-      ? PALETTE.donorBorderTop.clone().multiplyScalar(5.5)
-      : tier === "medium"
-        ? PALETTE.donorBorderHi.clone().multiplyScalar(6.5)
-        : PALETTE.donorBorder.clone().multiplyScalar(4.0);
-  return c.multiplyScalar(multiplier);
+function tierBorderOpacity(tier: "small" | "medium" | "large", multiplier = 1) {
+  const base = tier === "large" ? 1 : tier === "medium" ? 0.9 : 0.78;
+  return Math.min(1, base * multiplier);
 }
 
 export function HexCells({
@@ -67,10 +56,6 @@ export function HexCells({
   const labelUi = DOME_LABEL_PRESETS[viewport];
   const cells = useMemo(() => generateDomeCells(DOME_RADIUS), []);
 
-  /* Map donors → cells — STABLE.
-     Top 10 positions are computed from the donors array only, so they NEVER
-     move when selectedId changes. If a non-top-10 donor is selected, we
-     append them as an 11th hex in a deterministic free cell. */
   const baseMap = useMemo(
     () => mapTop10ToCells(cells, donors),
     [cells, donors],
@@ -83,17 +68,11 @@ export function HexCells({
     if (!selectedDonor) return baseMap.byCell;
     const extra = pickExtraCellFor(cells, baseMap, selectedDonor);
     if (extra == null) return baseMap.byCell;
-    // Clone + add the 11th — does NOT touch existing top-10 positions
     const map = new Map(baseMap.byCell);
     map.set(extra, selectedDonor);
     return map;
   }, [cells, donors, selectedId, baseMap]);
 
-  /* Build merged geometry — 3 layers for the glass-glow look:
-       (1) base lines   — per-vertex Y-axis gradient (dim → bright)
-       (2) glow halo    — additive cyan over every line (the "glowing border")
-       (3) accent layer — bright additive on ~18% random cells
-  */
   const BG_HEX_INSET = 0.92;
 
   const { bgBorderGeom, bgGlowGeom, bgAccentGeom, donorCellList } =
@@ -120,7 +99,6 @@ export function HexCells({
             ),
         );
 
-        // Min/max y of ring for the vertical gradient
         let minY = Infinity,
           maxY = -Infinity;
         ring.forEach((p) => {
@@ -168,8 +146,6 @@ export function HexCells({
       };
     }, [cells, cellToDonor]);
 
-  /* Labels — show ALL donor cells (already capped to ~10–11 by the
-     cellToDonor logic above). Selected donor gets a close button overlay. */
   const labels = useMemo(() => {
     const out: Array<{
       key: string;
@@ -200,7 +176,6 @@ export function HexCells({
 
   return (
     <>
-      {/* Background hex network — 3 merged draw calls */}
       <lineSegments>
         <primitive object={bgBorderGeom} attach="geometry" />
         <lineBasicMaterial
@@ -210,8 +185,6 @@ export function HexCells({
           toneMapped={false}
         />
       </lineSegments>
-
-      {/* Additive halo on every border — gives the "glowing edge" look */}
       <lineSegments>
         <primitive object={bgGlowGeom} attach="geometry" />
         <lineBasicMaterial
@@ -223,8 +196,6 @@ export function HexCells({
           toneMapped={false}
         />
       </lineSegments>
-
-      {/* Brightest ~18% */}
       <lineSegments>
         <primitive object={bgAccentGeom} attach="geometry" />
         <lineBasicMaterial
@@ -236,8 +207,6 @@ export function HexCells({
           toneMapped={false}
         />
       </lineSegments>
-
-      {/* Donor hexes — per-cell with pulse/blink + accent borders */}
       {donorCellList.map(({ cell, donor }) => (
         <DonorHex
           key={donor.id}
@@ -248,10 +217,6 @@ export function HexCells({
           onSelect={onSelect}
         />
       ))}
-
-      {/* Labels — fixed pixel size in a glass pill. Selected label has a
-          "↩" close button that releases the selection (= same as clicking
-          the hex again). */}
       {labels.map((label) => (
         <Html
           key={label.key}
@@ -271,17 +236,17 @@ export function HexCells({
               padding: `${labelUi.padY}px ${labelUi.padX}px`,
               borderRadius: "999px",
               background: label.selected
-                ? "rgba(20, 8, 0, 0.85)"
-                : "rgba(4, 9, 26, 0.72)",
+                ? "var(--color-primary-deep)"
+                : "var(--color-excadra-72)",
               border: label.selected
-                ? "1px solid rgba(240, 180, 41, 0.85)"
-                : "1px solid rgba(0, 200, 240, 0.28)",
+                ? "1px solid var(--color-gold-75)"
+                : "1px solid var(--color-accent-dim)",
               boxShadow: label.selected
-                ? "0 0 14px rgba(240,180,41,0.5), 0 4px 12px rgba(0,0,0,0.55)"
-                : "0 4px 12px rgba(0,0,0,0.45)",
+                ? "0 0 14px var(--color-gold-50), 0 4px 12px var(--shadow-medium)"
+                : "0 4px 12px var(--shadow-soft)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
-              fontFamily: "var(--font-exo2, system-ui, sans-serif)",
+              fontFamily: "var(--font-uaf, system-ui, sans-serif)",
               userSelect: "none",
               textAlign: "center",
               lineHeight: 1.15,
@@ -296,7 +261,9 @@ export function HexCells({
                   fontSize: `${labelUi.namePx}px`,
                   fontWeight: 600,
                   letterSpacing: "0.01em",
-                  color: label.selected ? "#ffd76b" : "#ffffff",
+                  color: label.selected
+                    ? "var(--color-primary-soft)"
+                    : "var(--color-white)",
                   maxWidth: `${labelUi.maxWidthPx}px`,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -309,7 +276,9 @@ export function HexCells({
                   style={{
                     fontSize: `${labelUi.areaPx}px`,
                     marginTop: 1,
-                    color: label.selected ? "#ffe49a" : "#9fe9ff",
+                    color: label.selected
+                      ? "var(--color-primary-soft)"
+                      : "var(--color-accent-glow)",
                     letterSpacing: "0.06em",
                     fontFamily:
                       "ui-monospace, SFMono-Regular, Menlo, monospace",
@@ -340,14 +309,14 @@ export function HexCells({
                   height: labelUi.namePx + 8,
                   marginLeft: 2,
                   borderRadius: 999,
-                  background: "rgba(240,180,41,0.18)",
-                  border: "1px solid rgba(240,180,41,0.85)",
-                  color: "#ffd76b",
+                  background: "var(--color-gold-18)",
+                  border: "1px solid var(--color-gold-75)",
+                  color: "var(--color-primary-soft)",
                   fontFamily: "inherit",
                   fontSize: labelUi.namePx,
                   lineHeight: 1,
                   padding: 0,
-                  boxShadow: "0 0 10px rgba(240,180,41,0.45)",
+                  boxShadow: "0 0 10px var(--color-gold-45)",
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
               >
@@ -357,13 +326,11 @@ export function HexCells({
           </div>
         </Html>
       ))}
-
-      {/* Anchor dots on each labeled hex */}
       {labels.map((label) => (
         <mesh key={label.key + "-dot"} position={label.anchorPos}>
           <sphereGeometry args={[labelUi.dotRadius, 8, 8]} />
           <meshBasicMaterial
-            color={label.selected ? "#ffd76b" : "#9fe9ff"}
+            color={label.selected ? "#fde68a" : "#cad3e8"}
             transparent
             opacity={label.selected ? 1 : 0.9}
             toneMapped={false}
@@ -389,11 +356,9 @@ function DonorHex({
 }) {
   const fillMatRef = useRef<THREE.MeshBasicMaterial>(null!);
   const lineMatRef = useRef<THREE.LineBasicMaterial>(null!);
-  const glowMatRef = useRef<THREE.LineBasicMaterial>(null!);
-  const ringMatRef = useRef<THREE.LineBasicMaterial>(null!);
   const tier = donorTier(donor.squareM2);
 
-  const { fillGeom, outlineGeom, glowOutlineGeom, ringGeom } = useMemo(() => {
+  const { fillGeom, outlineGeom } = useMemo(() => {
     const inset = 0.9;
     const c = cell.position;
     const ring = cell.verts.map(
@@ -429,81 +394,41 @@ function DonorHex({
       new THREE.Float32BufferAttribute(outlinePos, 3),
     );
 
-    // Glow outline = same geometry, drawn additively as a 2nd pass
-    const glowOutlineG = outlineG.clone();
-
-    // Halo ring — 6% larger contour for ambient "this is clickable" glow
-    const ringPos: number[] = [];
-    const ringInset = 1.05; // outside the actual outline
-    const ringPoints = cell.verts.map(
-      (p) =>
-        new THREE.Vector3(
-          c.x + (p.x - c.x) * inset * ringInset,
-          c.y + (p.y - c.y) * inset * ringInset,
-          c.z + (p.z - c.z) * inset * ringInset,
-        ),
-    );
-    for (let i = 0; i < ringPoints.length; i++) {
-      const a = ringPoints[i],
-        b = ringPoints[(i + 1) % ringPoints.length];
-      ringPos.push(a.x, a.y, a.z, b.x, b.y, b.z);
-    }
-    const ringG = new THREE.BufferGeometry();
-    ringG.setAttribute(
-      "position",
-      new THREE.Float32BufferAttribute(ringPos, 3),
-    );
-
     return {
       fillGeom: fillG,
       outlineGeom: outlineG,
-      glowOutlineGeom: glowOutlineG,
-      ringGeom: ringG,
     };
   }, [cell]);
 
-  /* Discrete BLINK on selected + ambient breathing halo on un-selected */
+  /* Discrete BLINK on selected. Fill stays visibly dark either way so the
+     donor hex is clearly readable as a filled cell. */
   useFrame((_, dt) => {
     if (!fillMatRef.current || !lineMatRef.current) return;
     const k = Math.min(1, dt * 12);
     // Blink: 380ms on, 220ms off
     const blinkOn = selected ? performance.now() % 600 < 380 : false;
-    // Ambient breathe for the halo so donor hexes are visibly clickable
-    const ambient = 0.45 + Math.sin(performance.now() * 0.0025) * 0.18;
 
     const targetFillOp = selected
       ? blinkOn
-        ? 0.55
-        : 0.12
+        ? 0.85
+        : 0.55
       : dimmed
-        ? 0.05
-        : 0.18;
+        ? 0.35
+        : 0.65;
     fillMatRef.current.opacity +=
       (targetFillOp - fillMatRef.current.opacity) * k;
 
     const targetLineOp = selected
       ? blinkOn
         ? 1.0
-        : 0.35
+        : 0.55
       : dimmed
         ? 0.45
-        : 0.95;
+        : tierBorderOpacity(tier);
     lineMatRef.current.opacity +=
       (targetLineOp - lineMatRef.current.opacity) * k;
 
-    if (glowMatRef.current) {
-      const t = selected ? (blinkOn ? 0.9 : 0.25) : dimmed ? 0.15 : 0.55;
-      glowMatRef.current.opacity += (t - glowMatRef.current.opacity) * k;
-    }
-    if (ringMatRef.current) {
-      const t = selected ? (blinkOn ? 0.85 : 0.35) : dimmed ? 0.1 : ambient;
-      ringMatRef.current.opacity += (t - ringMatRef.current.opacity) * k;
-    }
-
-    const targetCol = selected
-      ? PALETTE.donorBorderTop.clone().multiplyScalar(8)
-      : tierBorderColor(tier, dimmed ? 0.6 : 1);
-    lineMatRef.current.color.lerp(targetCol, k);
+    lineMatRef.current.color.copy(PALETTE.donorBorder);
 
     const targetFillCol = selected ? PALETTE.selectedFill : PALETTE.fillDonor;
     fillMatRef.current.color.lerp(targetFillCol, k);
@@ -534,48 +459,18 @@ function DonorHex({
           ref={fillMatRef}
           color={PALETTE.fillDonor}
           transparent
-          opacity={0.16}
-          blending={THREE.AdditiveBlending}
+          opacity={0.65}
           depthWrite={false}
           side={THREE.DoubleSide}
           toneMapped={false}
         />
       </mesh>
-
-      {/* Crisp base border */}
       <lineSegments geometry={outlineGeom}>
         <lineBasicMaterial
           ref={lineMatRef}
-          color={tierBorderColor(tier).getHex()}
+          color={PALETTE.donorBorder}
           transparent
-          opacity={0.95}
-          toneMapped={false}
-        />
-      </lineSegments>
-
-      {/* Additive glow on the SAME border — fakes line thickness */}
-      <lineSegments geometry={glowOutlineGeom}>
-        <lineBasicMaterial
-          ref={glowMatRef}
-          color={tierBorderColor(tier).clone().multiplyScalar(1.4).getHex()}
-          transparent
-          opacity={0.55}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </lineSegments>
-
-      {/* Outer halo ring (~5% larger) — ambient breathing glow so donor hexes
-          are visibly clickable without hover. */}
-      <lineSegments geometry={ringGeom}>
-        <lineBasicMaterial
-          ref={ringMatRef}
-          color={tierBorderColor(tier).clone().multiplyScalar(0.8).getHex()}
-          transparent
-          opacity={0.45}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
+          opacity={1}
           toneMapped={false}
         />
       </lineSegments>

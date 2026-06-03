@@ -70,7 +70,7 @@ function CircularProgress({
   percent,
   label,
   sub,
-  color = "#00c8f0",
+  color = "var(--color-primary)",
 }: {
   percent: number;
   label: string;
@@ -149,9 +149,13 @@ function CustomTooltip({ active, payload, label }: any) {
       }}
     >
       <p className="mb-1 font-medium">{label}</p>
-      <p style={{ color: "#00c8f0" }}>{fmtUah(payload[0]?.value ?? 0)}</p>
+      <p style={{ color: "var(--color-primary)" }}>
+        {fmtUah(payload[0]?.value ?? 0)}
+      </p>
       {payload[1] && (
-        <p style={{ color: "#8bb4d0" }}>{payload[1].value} донатів</p>
+        <p style={{ color: "var(--color-text-dim)" }}>
+          {payload[1].value} донатів
+        </p>
       )}
     </div>
   );
@@ -303,25 +307,33 @@ export default function AdminCharts() {
               >
                 <defs>
                   <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00c8f0" stopOpacity={0.22} />
-                    <stop offset="95%" stopColor="#00c8f0" stopOpacity={0} />
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-primary)"
+                      stopOpacity={0.22}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-primary)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="#132d4d"
+                  stroke="var(--color-border)"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: "#4a6d8c" }}
+                  tick={{ fontSize: 10, fill: "var(--color-text-muted)" }}
                   axisLine={false}
                   tickLine={false}
                   interval="preserveStartEnd"
                 />
                 <YAxis
                   tickFormatter={fmtUah}
-                  tick={{ fontSize: 10, fill: "#4a6d8c" }}
+                  tick={{ fontSize: 10, fill: "var(--color-text-muted)" }}
                   axisLine={false}
                   tickLine={false}
                   width={58}
@@ -331,11 +343,11 @@ export default function AdminCharts() {
                   type="monotone"
                   dataKey="amount"
                   name="amount"
-                  stroke="#00c8f0"
+                  stroke="var(--color-primary)"
                   strokeWidth={2}
                   fill="url(#areaGrad)"
                   dot={false}
-                  activeDot={{ r: 4, fill: "#00c8f0" }}
+                  activeDot={{ r: 4, fill: "var(--color-primary)" }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -373,13 +385,13 @@ export default function AdminCharts() {
                 percent={data.coverage.goalPercent}
                 label="Зібрано коштів"
                 sub={`${fmtUah(data.coverage.collectedUah)} з ${fmtUah(data.coverage.totalGoalUah)}`}
-                color="#00c8f0"
+                color="var(--color-primary)"
               />
               <CircularProgress
                 percent={data.coverage.coveragePercent}
                 label="Площа покрита"
                 sub={`${fmtM2(data.coverage.coveredM2)} з ${fmtM2(data.coverage.totalM2)}`}
-                color="#f0b429"
+                color="var(--color-accent-hover)"
               />
             </div>
           )}

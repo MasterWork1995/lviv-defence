@@ -105,7 +105,7 @@ export const SearchCard = ({
                     className={[
                       "group grid w-full cursor-pointer grid-cols-[22px_1fr_auto_12px] items-center gap-2.5 rounded-md border px-3 py-2.5 text-left transition-all duration-150",
                       active
-                        ? "border-primary/50 bg-primary/10 shadow-[0_0_0_1px_rgba(0,200,240,0.2)]"
+                        ? "border-primary/50 bg-primary/10 shadow-[0_0_0_1px_var(--color-gold-20)]"
                         : "border-border/40 bg-surface-2/30 hover:border-primary/30 hover:bg-surface-2/60",
                     ].join(" ")}
                   >

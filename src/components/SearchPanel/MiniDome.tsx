@@ -30,13 +30,13 @@ export const MiniDome = ({ sector }: MiniDomeProps) => {
         <path
           d="M 6 62 A 44 44 0 0 1 94 62"
           fill="none"
-          stroke="rgba(0,200,240,0.55)"
+          stroke="var(--color-accent-hover)"
           strokeWidth="0.7"
         />
         <path
           d="M 22 62 A 28 28 0 0 1 78 62"
           fill="none"
-          stroke="rgba(0,200,240,0.3)"
+          stroke="var(--color-accent)"
           strokeWidth="0.5"
         />
         <line
@@ -44,7 +44,7 @@ export const MiniDome = ({ sector }: MiniDomeProps) => {
           y1="62"
           x2="98"
           y2="62"
-          stroke="rgba(0,200,240,0.6)"
+          stroke="var(--color-accent-hover)"
           strokeWidth="0.6"
         />
         {CELLS.map((c, i) => {
@@ -57,8 +57,8 @@ export const MiniDome = ({ sector }: MiniDomeProps) => {
             <polygon
               key={i}
               points={pts}
-              fill={isHi ? "rgba(240,180,41,0.35)" : "rgba(7,20,40,0.55)"}
-              stroke={isHi ? "var(--color-gold)" : "rgba(26,101,192,0.7)"}
+              fill={isHi ? "var(--color-gold-35)" : "var(--color-excadra-55)"}
+              stroke={isHi ? "var(--color-gold)" : "var(--color-accent-dim)"}
               strokeWidth={isHi ? 1.4 : 0.7}
               style={
                 isHi

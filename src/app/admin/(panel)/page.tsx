@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { TrendingUp, Heart, Eye, Wrench, Plus, EyeOff, Trash2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+  TrendingUp,
+  Heart,
+  Eye,
+  Wrench,
+  Plus,
+  EyeOff,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { adminFetch } from "@/lib/admin-fetch";
 import AdminCharts from "./AdminCharts";
 import { StatCard } from "./components/StatCard";
@@ -63,7 +74,11 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, totalPages: 1, total: 0 });
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const [loadingDonations, setLoadingDonations] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -79,7 +94,9 @@ export default function AdminDashboardPage() {
       .catch(() => {});
   }, []);
 
-  useEffect(() => { loadStats(); }, [loadStats]);
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   const loadDonations = useCallback(async () => {
     setLoadingDonations(true);
@@ -96,7 +113,9 @@ export default function AdminDashboardPage() {
     setLoadingDonations(false);
   }, [page, search, statusFilter, hiddenFilter]);
 
-  useEffect(() => { loadDonations(); }, [loadDonations]);
+  useEffect(() => {
+    loadDonations();
+  }, [loadDonations]);
 
   async function toggleHidden(id: string, current: boolean) {
     await adminFetch(`/api/admin/donations/${id}`, {
@@ -130,24 +149,32 @@ export default function AdminDashboardPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <StatCard
-          label="Зібрано" value={stats ? fmtUah(stats.totalRaised) : "—"}
+          label="Зібрано"
+          value={stats ? fmtUah(stats.totalRaised) : "—"}
           sub={stats ? `${stats.goalPercent}% від цілі` : undefined}
-          icon={TrendingUp} accent="var(--color-success)"
+          icon={TrendingUp}
+          accent="var(--color-success)"
         />
         <StatCard
-          label="Донати (paid)" value={stats ? String(stats.paidDonations) : "—"}
+          label="Донати (paid)"
+          value={stats ? String(stats.paidDonations) : "—"}
           sub={stats ? `${stats.pendingDonations} pending` : undefined}
-          icon={Heart} accent="var(--color-primary)"
+          icon={Heart}
+          accent="var(--color-primary)"
         />
         <StatCard
-          label="Приховано" value={stats ? String(stats.hiddenDonations) : "—"}
+          label="Приховано"
+          value={stats ? String(stats.hiddenDonations) : "—"}
           sub="потребують перевірки"
-          icon={Eye} accent="var(--color-warning)"
+          icon={Eye}
+          accent="var(--color-warning)"
         />
         <StatCard
-          label="Витрати" value={stats ? fmtUah(stats.totalExpenses) : "—"}
+          label="Витрати"
+          value={stats ? fmtUah(stats.totalExpenses) : "—"}
           sub={stats ? `${stats.expensesCount} записів` : undefined}
-          icon={Wrench} accent="var(--color-error)"
+          icon={Wrench}
+          accent="var(--color-error)"
         />
       </div>
 
@@ -156,10 +183,16 @@ export default function AdminDashboardPage() {
 
       {/* Header + filters */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-semibold font-display" style={{ color: "var(--color-text)" }}>
+        <h2
+          className="text-base font-semibold font-display"
+          style={{ color: "var(--color-text)" }}
+        >
           Донати
           {pagination.total > 0 && (
-            <span className="ml-2 text-sm font-normal" style={{ color: "var(--color-text-muted)" }}>
+            <span
+              className="ml-2 text-sm font-normal"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               ({pagination.total})
             </span>
           )}
@@ -167,7 +200,10 @@ export default function AdminDashboardPage() {
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-80"
-          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+          style={{
+            background: "var(--color-primary)",
+            color: "var(--color-bg)",
+          }}
         >
           <Plus size={15} /> Додати вручну
         </button>
@@ -175,18 +211,38 @@ export default function AdminDashboardPage() {
 
       <div
         className="flex flex-wrap gap-3 mb-4 p-4 rounded-xl border"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
+        style={{
+          background: "var(--color-surface)",
+          borderColor: "var(--color-border)",
+        }}
       >
         <input
-          type="text" placeholder="Пошук за ім'ям..."
-          value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          type="text"
+          placeholder="Пошук за ім'ям..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="flex-1 min-w-[180px] rounded-lg px-3 py-2 text-sm border outline-none"
-          style={{ background: "var(--color-surface-2)", borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          style={{
+            background: "var(--color-surface-2)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text)",
+          }}
         />
         <select
-          value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+          }}
           className="rounded-lg px-3 py-2 text-sm border outline-none"
-          style={{ background: "var(--color-surface-2)", borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          style={{
+            background: "var(--color-surface-2)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text)",
+          }}
         >
           <option value="">Всі статуси</option>
           <option value="paid">Paid</option>
@@ -194,9 +250,17 @@ export default function AdminDashboardPage() {
           <option value="cancelled">Cancelled</option>
         </select>
         <select
-          value={hiddenFilter} onChange={(e) => { setHiddenFilter(e.target.value); setPage(1); }}
+          value={hiddenFilter}
+          onChange={(e) => {
+            setHiddenFilter(e.target.value);
+            setPage(1);
+          }}
           className="rounded-lg px-3 py-2 text-sm border outline-none"
-          style={{ background: "var(--color-surface-2)", borderColor: "var(--color-border)", color: "var(--color-text)" }}
+          style={{
+            background: "var(--color-surface-2)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text)",
+          }}
         >
           <option value="">Видимість: всі</option>
           <option value="false">Видимі</option>
@@ -207,21 +271,37 @@ export default function AdminDashboardPage() {
       {/* Table */}
       <div
         className="rounded-xl border overflow-hidden relative"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border)" }}
+        style={{
+          background: "var(--color-surface)",
+          borderColor: "var(--color-border)",
+        }}
       >
         {loadingDonations && (
           <div
             className="absolute inset-0 z-10 flex items-center justify-center rounded-xl"
-            style={{ background: "rgba(4,9,26,0.55)" }}
+            style={{ background: "var(--color-excadra-55)" }}
           >
-            <Loader2 size={28} className="animate-spin" style={{ color: "var(--color-primary)" }} />
+            <Loader2
+              size={28}
+              className="animate-spin"
+              style={{ color: "var(--color-primary)" }}
+            />
           </div>
         )}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: "1px solid var(--color-border)" }}>
-                {["Донор", "Сума", "Площа", "Статус", "Провайдер", "Видимість", "Дата", "Дії"].map((h) => (
+                {[
+                  "Донор",
+                  "Сума",
+                  "Площа",
+                  "Статус",
+                  "Провайдер",
+                  "Видимість",
+                  "Дата",
+                  "Дії",
+                ].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-xs font-medium tracking-wide uppercase whitespace-nowrap"
@@ -235,7 +315,11 @@ export default function AdminDashboardPage() {
             <tbody>
               {!loadingDonations && donations.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center" style={{ color: "var(--color-text-muted)" }}>
+                  <td
+                    colSpan={8}
+                    className="px-4 py-10 text-center"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     Нічого не знайдено
                   </td>
                 </tr>
@@ -246,21 +330,33 @@ export default function AdminDashboardPage() {
                   className="border-b last:border-0 hover:bg-[var(--color-surface-2)] transition-colors"
                   style={{ borderColor: "var(--color-border-dim)" }}
                 >
-                  <td className="px-4 py-3" style={{ color: "var(--color-text)" }}>
+                  <td
+                    className="px-4 py-3"
+                    style={{ color: "var(--color-text)" }}
+                  >
                     {d.name}
                     {d.isManual && (
                       <span
                         className="ml-1.5 text-xs px-1 py-0.5 rounded"
-                        style={{ background: "var(--color-surface-3)", color: "var(--color-text-dim)" }}
+                        style={{
+                          background: "var(--color-surface-3)",
+                          color: "var(--color-text-dim)",
+                        }}
                       >
                         manual
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--color-success)" }}>
+                  <td
+                    className="px-4 py-3 font-medium whitespace-nowrap"
+                    style={{ color: "var(--color-success)" }}
+                  >
                     {fmtUah(d.amount)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap" style={{ color: "var(--color-text-dim)" }}>
+                  <td
+                    className="px-4 py-3 whitespace-nowrap"
+                    style={{ color: "var(--color-text-dim)" }}
+                  >
                     {d.squareM2.toFixed(2)} м²
                   </td>
                   <td className="px-4 py-3">
@@ -279,7 +375,10 @@ export default function AdminDashboardPage() {
                       <option value="cancelled">cancelled</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <td
+                    className="px-4 py-3 text-xs"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     {d.provider}
                   </td>
                   <td className="px-4 py-3">
@@ -287,15 +386,22 @@ export default function AdminDashboardPage() {
                       onClick={() => toggleHidden(d.id, d.isHidden)}
                       className="flex items-center gap-1 text-xs px-2 py-1 rounded transition-opacity hover:opacity-80"
                       style={{
-                        background: d.isHidden ? "var(--color-warning)20" : "var(--color-success)20",
-                        color: d.isHidden ? "var(--color-warning)" : "var(--color-success)",
+                        background: d.isHidden
+                          ? "var(--color-warning)20"
+                          : "var(--color-success)20",
+                        color: d.isHidden
+                          ? "var(--color-warning)"
+                          : "var(--color-success)",
                       }}
                     >
                       {d.isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
                       {d.isHidden ? "hidden" : "visible"}
                     </button>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <td
+                    className="px-4 py-3 whitespace-nowrap text-xs"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
                     {new Date(d.createdAt).toLocaleDateString("uk-UA")}
                   </td>
                   <td className="px-4 py-3">
@@ -318,7 +424,10 @@ export default function AdminDashboardPage() {
             className="flex items-center justify-between px-4 py-3 border-t"
             style={{ borderColor: "var(--color-border)" }}
           >
-            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            <span
+              className="text-xs"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               Всього: {pagination.total}
             </span>
             <div className="flex items-center gap-2">
@@ -330,7 +439,10 @@ export default function AdminDashboardPage() {
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="text-xs" style={{ color: "var(--color-text-dim)" }}>
+              <span
+                className="text-xs"
+                style={{ color: "var(--color-text-dim)" }}
+              >
                 {page} / {pagination.totalPages}
               </span>
               <button
@@ -349,7 +461,10 @@ export default function AdminDashboardPage() {
       {showModal && (
         <ManualDonationModal
           onClose={() => setShowModal(false)}
-          onSaved={() => { loadDonations(); loadStats(); }}
+          onSaved={() => {
+            loadDonations();
+            loadStats();
+          }}
         />
       )}
       {deleteId && (

@@ -41,7 +41,7 @@ export const CtaCard = ({ stats, onDonate }: CtaCardProps) => {
       <div className="mt-4 grid grid-cols-2 gap-3">
         <StatItem
           dotClassName="border-primary/60 bg-primary/15"
-          dotGlow="0 0 6px rgba(0,200,240,0.4)"
+          dotGlow="0 0 6px var(--color-gold-45)"
           value={t("search.areaValue", {
             value: stats.totalKm2,
             unit: t("progress.areaUnit"),
@@ -51,7 +51,7 @@ export const CtaCard = ({ stats, onDonate }: CtaCardProps) => {
         />
         <StatItem
           dotClassName="border-gold/70 bg-gold/15"
-          dotGlow="0 0 6px rgba(240,180,41,0.45)"
+          dotGlow="0 0 6px var(--color-gold-45)"
           value={t("search.areaValue", {
             value: stats.collectedKm2,
             unit: t("progress.areaUnit"),

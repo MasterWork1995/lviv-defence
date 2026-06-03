@@ -24,7 +24,7 @@ function DomeLoader() {
           className="relative h-3 w-3 rounded-full bg-primary"
           style={{
             boxShadow:
-              "0 0 16px #00c8f0, 0 0 40px rgba(0,200,240,0.5)",
+              "0 0 16px var(--color-primary), 0 0 40px var(--color-gold-50)",
           }}
         />
       </div>

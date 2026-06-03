@@ -1,54 +1,129 @@
 @import "tailwindcss";
 
-/* ─── Design tokens (extracted from reference) ─── */
+/* ─────────────────────────────────────────────────────────────────
+   Design tokens — strict 4-colour system
+   Base palette (the ONLY raw colours allowed):
+     white       #ffffff
+     excadra     #111224
+     storm-sky   #293757
+     gold        #f39200
+
+   Every other token below is a deterministic shade/tint/blend of
+   these four base hues. No new hues are introduced. Always reference
+   tokens via var(--color-…) — never hardcode hex/rgba in components.
+   ───────────────────────────────────────────────────────────────── */
 @theme {
-  /* Backgrounds */
-  --color-bg: #04091a;
-  --color-surface: #071428;
-  --color-surface-2: #0a1d3a;
-  --color-surface-3: #0f2548;
+  /* ─── Base palette ─── */
+  --color-white: #ffffff;
+  --color-excadra: #111224;
+  --color-storm-sky: #293757;
+  --color-gold: #f39200;
 
-  /* Borders */
-  --color-border: #132d4d;
-  --color-border-dim: #0c2240;
+  /* ─── Surface tiers (excadra → storm-sky interpolation) ─── */
+  --color-bg: #111224; /* = excadra */
+  --color-surface: #161a2c; /* 15% storm-sky */
+  --color-surface-2: #1c2238; /* 30% storm-sky */
+  --color-surface-3: #232b45; /* 50% storm-sky */
 
-  /* Primary cyan accent — dome glow, CTA, highlights */
-  --color-primary: #00c8f0;
-  --color-primary-hover: #00b4d8;
-  --color-primary-dim: #007a96;
-  --color-primary-glow: rgba(0, 200, 240, 0.14);
+  /* ─── Borders (storm-sky tints, brightening toward white) ─── */
+  --color-border-dim: #293757; /* = storm-sky */
+  --color-border: #3d4866; /* +15% white */
+  --color-border-strong: #58627d; /* +35% white */
 
-  /* Dome specific */
-  --color-dome-line: #1a65c0;
-  --color-dome-glow: #38b0f0;
-  --color-dome-select: #00d4ff;
-  --color-dome-fill: rgba(0, 212, 255, 0.08);
+  /* ─── Text (white → storm-sky interpolation) ─── */
+  --color-text: #ffffff; /* = white */
+  --color-text-dim: #cad3e8; /* 80% white */
+  --color-text-muted: #8a96b8; /* 55% white */
 
-  /* Text */
-  --color-text: #ffffff;
-  --color-text-dim: #8bb4d0;
-  --color-text-muted: #4a6d8c;
+  /* ─── Primary = gold (CTA, donor highlights, attention) ─── */
+  --color-primary: #f39200;
+  --color-primary-hover: #ffaa3a;
+  --color-primary-dim: #b56b00;
+  --color-primary-soft: #fde68a; /* very pale gold (text on dark gold bg) */
+  --color-primary-deep: #3d2800; /* very dark gold (warn-box bg) */
+  --color-primary-shadow: #7a4800; /* mid-dark gold (warn-box border) */
 
-  /* Status */
+  /* ─── Accent = storm-sky family (cool structure, dome lines) ─── */
+  --color-accent: #58627d; /* storm-sky +35% white */
+  --color-accent-hover: #7e8aa8; /* storm-sky +55% white */
+  --color-accent-dim: #3d4866; /* storm-sky +15% white */
+  --color-accent-glow: #cad3e8; /* almost-white cool tone */
+
+  /* ─── Dome tokens (semantic aliases) ─── */
+  --color-dome-line: #58627d; /* = accent */
+  --color-dome-glow: #cad3e8; /* = accent-glow */
+  --color-dome-select: #f39200; /* = gold */
+
+  /* ─── Status (semantic, kept) ─── */
   --color-success: #22c55e;
   --color-warning: #eab308;
   --color-error: #ef4444;
 
-  /* Logo gold accent */
-  --color-gold: #f0b429;
-
-  /* Utility aliases for Tailwind class compatibility */
-  --color-background: #04091a;
+  /* ─── Tailwind aliases for `bg-background` / `text-foreground` ─── */
+  --color-background: #111224;
   --color-foreground: #ffffff;
 
-  /* Fonts */
-  --font-sans: var(--font-exo2);
-  --font-display: var(--font-russo);
+  /* ─── Fonts ───
+     Single typeface (UAF Sans) used everywhere. Both `--font-sans`
+     and `--font-display` alias to `--font-uaf` so all existing
+     Tailwind utilities / CSS rules keep working without changes. */
+  --font-sans: var(--font-uaf);
+  --font-display: var(--font-uaf);
+}
+
+/* ─── Alpha helpers (kept outside @theme so they don't pollute
+       Tailwind utility class generation). Use these everywhere
+       instead of inlining rgba(…) values. ─── */
+:root {
+  /* Excadra alphas — overlays, vignettes, modal backdrops */
+  --color-excadra-95: rgba(17, 18, 36, 0.95);
+  --color-excadra-92: rgba(17, 18, 36, 0.92);
+  --color-excadra-85: rgba(17, 18, 36, 0.85);
+  --color-excadra-72: rgba(17, 18, 36, 0.72);
+  --color-excadra-55: rgba(17, 18, 36, 0.55);
+  --color-excadra-35: rgba(17, 18, 36, 0.35);
+
+  /* Storm-sky alphas — soft surfaces, dome fill */
+  --color-storm-sky-90: rgba(41, 55, 87, 0.9);
+  --color-storm-sky-70: rgba(41, 55, 87, 0.7);
+  --color-storm-sky-50: rgba(41, 55, 87, 0.5);
+  --color-storm-sky-35: rgba(41, 55, 87, 0.35);
+
+  /* Gold alphas — primary glow, focus rings, selected states */
+  --color-gold-75: rgba(243, 146, 0, 0.75);
+  --color-gold-55: rgba(243, 146, 0, 0.55);
+  --color-gold-50: rgba(243, 146, 0, 0.5);
+  --color-gold-45: rgba(243, 146, 0, 0.45);
+  --color-gold-42: rgba(243, 146, 0, 0.42);
+  --color-gold-35: rgba(243, 146, 0, 0.35);
+  --color-gold-28: rgba(243, 146, 0, 0.28);
+  --color-gold-20: rgba(243, 146, 0, 0.2);
+  --color-gold-18: rgba(243, 146, 0, 0.18);
+  --color-gold-15: rgba(243, 146, 0, 0.15);
+  --color-gold-14: rgba(243, 146, 0, 0.14);
+  --color-gold-12: rgba(243, 146, 0, 0.12);
+  --color-gold-08: rgba(243, 146, 0, 0.08);
+
+  /* White alphas — shimmer highlights, inset borders */
+  --color-white-90: rgba(255, 255, 255, 0.9);
+  --color-white-55: rgba(255, 255, 255, 0.55);
+  --color-white-40: rgba(255, 255, 255, 0.4);
+  --color-white-15: rgba(255, 255, 255, 0.15);
+
+  /* Universal shadow alphas (black) — for soft elevation only */
+  --shadow-soft: rgba(0, 0, 0, 0.45);
+  --shadow-medium: rgba(0, 0, 0, 0.55);
+  --shadow-strong: rgba(0, 0, 0, 0.6);
+
+  /* Primary glow alias used in focus rings and CTAs */
+  --color-primary-glow: var(--color-gold-14);
 }
 
 /* ─── Font utilities ─── */
 .font-display {
-  font-family: var(--font-russo), var(--font-exo2), system-ui, sans-serif;
+  font-family: var(--font-uaf), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 /* ─── Base ─── */
@@ -65,7 +140,7 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-uaf), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -81,7 +156,7 @@ body {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-dim);
+  background: var(--color-primary);
 }
 
 /* ─── Admin input ─── */
@@ -100,42 +175,43 @@ body {
   border-color: var(--color-primary);
 }
 
-/* ─── Glow utilities ─── */
+/* ─── Glow utilities — gold-toned ─── */
 .glow-primary {
   box-shadow:
-    0 0 20px rgba(0, 200, 240, 0.28),
-    0 0 40px rgba(0, 200, 240, 0.12);
+    0 0 20px var(--color-gold-28),
+    0 0 40px var(--color-gold-12);
 }
 
 .glow-primary:hover {
   box-shadow:
-    0 0 28px rgba(0, 200, 240, 0.42),
-    0 0 60px rgba(0, 200, 240, 0.18);
+    0 0 28px var(--color-gold-42),
+    0 0 60px var(--color-gold-18);
 }
 
 .glow-dome {
   box-shadow:
-    0 0 15px rgba(56, 176, 240, 0.4),
-    0 0 30px rgba(56, 176, 240, 0.15);
+    0 0 15px var(--color-gold-35),
+    0 0 30px var(--color-gold-15);
 }
 
 .text-glow {
-  text-shadow: 0 0 20px rgba(0, 200, 240, 0.6);
+  text-shadow: 0 0 20px var(--color-gold-55);
 }
 
+/* ─── Progress bar — storm-sky → gold flow ─── */
 .progress-bar-track {
   position: relative;
   height: 0.75rem;
   flex: 1;
   overflow: hidden;
   border-radius: 9999px;
-  border: 1px solid rgba(0, 200, 240, 0.35);
+  border: 1px solid var(--color-gold-35);
   background: linear-gradient(
     180deg,
-    rgba(7, 20, 40, 0.95) 0%,
-    rgba(15, 37, 72, 0.9) 100%
+    var(--color-surface) 0%,
+    var(--color-surface-3) 100%
   );
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 2px 6px var(--shadow-soft);
 }
 
 @media (min-width: 1024px) {
@@ -161,20 +237,19 @@ body {
   border-radius: 9999px;
   background: linear-gradient(
     95deg,
-    #0c3d6e 0%,
-    #1a65c0 14%,
-    #0098c4 32%,
-    #00d4ff 48%,
-    #4de8ff 58%,
-    #6b8cff 72%,
-    #b06cff 86%,
-    #f0b429 100%
+    var(--color-storm-sky) 0%,
+    var(--color-accent-dim) 18%,
+    var(--color-accent) 36%,
+    var(--color-accent-hover) 52%,
+    var(--color-primary-dim) 68%,
+    var(--color-primary) 86%,
+    var(--color-primary-hover) 100%
   );
   box-shadow:
-    0 0 14px rgba(0, 212, 255, 0.55),
-    0 0 28px rgba(176, 108, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -3px 10px rgba(0, 50, 90, 0.35);
+    0 0 14px var(--color-gold-55),
+    0 0 28px var(--color-gold-20),
+    inset 0 1px 0 var(--color-white-40),
+    inset 0 -3px 10px var(--color-excadra-35);
 }
 
 .progress-bar-fill-cap {
@@ -187,15 +262,15 @@ body {
   transform: translate(35%, -50%);
   background: radial-gradient(
     circle,
-    #ffffff 0%,
-    #fff4c4 35%,
-    #f0b429 70%,
+    var(--color-white) 0%,
+    var(--color-primary-soft) 35%,
+    var(--color-primary) 70%,
     transparent 100%
   );
   box-shadow:
-    0 0 10px rgba(255, 255, 255, 0.9),
-    0 0 18px rgba(240, 180, 41, 0.75),
-    0 0 24px rgba(0, 232, 255, 0.5);
+    0 0 10px var(--color-white-90),
+    0 0 18px var(--color-gold-75),
+    0 0 24px var(--color-gold-50);
   pointer-events: none;
 }
 
@@ -218,9 +293,9 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.15) 30%,
-    rgba(255, 255, 255, 0.55) 50%,
-    rgba(255, 255, 255, 0.15) 70%,
+    var(--color-white-15) 30%,
+    var(--color-white-55) 50%,
+    var(--color-white-15) 70%,
     transparent 100%
   );
   animation: progress-shimmer-slide 2.8s linear infinite;
