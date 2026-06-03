@@ -24,7 +24,7 @@ export interface DonorData {
 }
 
 export const DOME_RADIUS = 4.5;
-const SUBDIVISION = 5;
+const SUBDIVISION = 4;
 
 export type DomeViewport = "desktop" | "tablet" | "mobile";
 

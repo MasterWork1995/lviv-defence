@@ -12,10 +12,9 @@ export const Hero = () => {
   const t = useTranslations();
 
   return (
-    // h-full fills the CSS grid's 1fr row — no hardcoded pixel offsets
-    <section className="relative h-full overflow-hidden">
-      <div className="absolute inset-0 flex flex-col xl:hidden">
-        <div className="relative z-0 shrink-0 basis-[clamp(200px,36vh,340px)] overflow-hidden md:basis-[50vh] md:min-h-[50vh] md:max-h-[62vh] lg:basis-[52vh] lg:min-h-[50vh] lg:max-h-[60vh]">
+    <section className="relative xl:h-full xl:overflow-hidden">
+      <div className="flex flex-col xl:absolute xl:inset-0 xl:hidden">
+        <div className="relative z-0 h-[clamp(200px,36vh,340px)] shrink-0 overflow-hidden md:h-[50vh] md:max-h-[62vh] lg:h-[52vh] lg:max-h-[60vh]">
           <div className="absolute inset-0 overflow-hidden">
             <Image
               src="/assets/Lviv.jpeg"
@@ -40,13 +39,12 @@ export const Hero = () => {
           </div>
         </div>
 
-        <div className="relative z-10 flex min-h-0 flex-1 flex-col border-t border-primary/10 bg-bg shadow-[0_-12px_40px_var(--color-excadra-85)]">
+        <div className="relative z-10 flex flex-col border-t border-primary/10 bg-bg shadow-[0_-12px_40px_var(--color-excadra-85)]">
           <SearchPanel />
         </div>
       </div>
 
       <div className="absolute inset-0 hidden xl:flex">
-        {/* Full-section background */}
         <Image
           src="/assets/Lviv.jpeg"
           alt="Нічний Львів"
@@ -62,14 +60,10 @@ export const Hero = () => {
           className="pointer-events-none absolute inset-0"
           style={{ background: RADIAL }}
         />
-
-        {/* Left: dome fills the panel */}
         <div className="relative flex-1">
           <div className="absolute inset-0">
             <DomeCanvas />
           </div>
-
-          {/* Bottom-left badge */}
           <div className="absolute bottom-5 left-5 z-10">
             <div className="flex items-center gap-3 rounded border border-border/40 bg-surface/50 px-3 py-2.5 backdrop-blur-sm">
               <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded border border-primary/30 bg-surface-2/70">
@@ -99,10 +93,7 @@ export const Hero = () => {
             </div>
           </div>
         </div>
-
-        {/* Right: search panel — wider for the new card-based layout */}
         <div className="relative z-10 flex w-[400px] flex-shrink-0 flex-col border-l border-primary/15 bg-bg/55 backdrop-blur-xl">
-          {/* Top cyan accent line */}
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
           <SearchPanel />
         </div>

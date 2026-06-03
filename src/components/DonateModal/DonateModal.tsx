@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 import { DonateModalForm } from "./DonateModalForm";
 import type { DonateModalProps } from "./types";
 import { useDonateForm } from "./useDonateForm";
@@ -16,6 +17,19 @@ export const DonateModal = ({ isOpen, onClose }: DonateModalProps) => {
     loading: settingsLoading,
   } = useDonateSettings(isOpen);
   const form = useDonateForm({ m2PerUah });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const { body, documentElement: html } = document;
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlOverflow = html.style.overflow;
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    return () => {
+      body.style.overflow = prevBodyOverflow;
+      html.style.overflow = prevHtmlOverflow;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -46,7 +60,7 @@ export const DonateModal = ({ isOpen, onClose }: DonateModalProps) => {
           aria-modal="true"
           aria-labelledby="donate-modal-title"
           aria-describedby="donate-modal-desc"
-          className="relative max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-4 shadow-2xl sm:p-6"
+          className="relative max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-4 shadow-2xl sm:p-6"
           onClick={(e) => e.stopPropagation()}
         >
           <button

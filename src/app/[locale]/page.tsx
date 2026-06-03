@@ -3,10 +3,9 @@ import { Hero } from "@/components/Hero/Hero";
 
 export default function HomePage() {
   return (
-    // CSS Grid: header takes its natural height, hero fills the rest — no hardcoded px
-    <div className="grid h-dvh grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-bg">
+    <div className="grid min-h-dvh grid-rows-[auto_minmax(0,1fr)] bg-bg xl:h-dvh xl:overflow-hidden">
       <Header />
-      <main className="min-h-0 overflow-hidden">
+      <main className="min-h-0 xl:overflow-hidden">
         <Hero />
       </main>
     </div>

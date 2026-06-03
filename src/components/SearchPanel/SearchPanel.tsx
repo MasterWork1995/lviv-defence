@@ -25,12 +25,9 @@ export const SearchPanel = () => {
 
   return (
     <>
-      <DonateModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <DonateModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      <div className="flex h-full flex-col gap-3 overflow-y-auto p-4 lg:px-5">
+      <div className="flex flex-col gap-3 p-4 xl:h-full xl:overflow-y-auto xl:px-5">
         <SearchCard
           query={query}
           onQueryChange={setQuery}
