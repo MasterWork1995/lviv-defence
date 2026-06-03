@@ -1,17 +1,5 @@
 @import "tailwindcss";
 
-/* ─────────────────────────────────────────────────────────────────
-   Design tokens — strict 4-colour system
-   Base palette (the ONLY raw colours allowed):
-     white       #ffffff
-     excadra     #111224
-     storm-sky   #293757
-     gold        #f39200
-
-   Every other token below is a deterministic shade/tint/blend of
-   these four base hues. No new hues are introduced. Always reference
-   tokens via var(--color-…) — never hardcode hex/rgba in components.
-   ───────────────────────────────────────────────────────────────── */
 @theme {
   /* ─── Base palette ─── */
   --color-white: #ffffff;
@@ -59,21 +47,12 @@
   --color-warning: #eab308;
   --color-error: #ef4444;
 
-  /* ─── Tailwind aliases for `bg-background` / `text-foreground` ─── */
   --color-background: #111224;
   --color-foreground: #ffffff;
-
-  /* ─── Fonts ───
-     Single typeface (UAF Sans) used everywhere. Both `--font-sans`
-     and `--font-display` alias to `--font-uaf` so all existing
-     Tailwind utilities / CSS rules keep working without changes. */
   --font-sans: var(--font-uaf);
   --font-display: var(--font-uaf);
 }
 
-/* ─── Alpha helpers (kept outside @theme so they don't pollute
-       Tailwind utility class generation). Use these everywhere
-       instead of inlining rgba(…) values. ─── */
 :root {
   /* Excadra alphas — overlays, vignettes, modal backdrops */
   --color-excadra-95: rgba(17, 18, 36, 0.95);
@@ -110,13 +89,8 @@
   --color-white-40: rgba(255, 255, 255, 0.4);
   --color-white-15: rgba(255, 255, 255, 0.15);
 
-  /* Universal shadow alphas (black) — for soft elevation only */
   --shadow-soft: rgba(0, 0, 0, 0.45);
   --shadow-medium: rgba(0, 0, 0, 0.55);
-  --shadow-strong: rgba(0, 0, 0, 0.6);
-
-  /* Primary glow alias used in focus rings and CTAs */
-  --color-primary-glow: var(--color-gold-14);
 }
 
 /* ─── Font utilities ─── */

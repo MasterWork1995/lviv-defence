@@ -1,15 +1,4 @@
 import * as THREE from "three";
-
-/* ─────────────────────────────────────────────
-   Goldberg-polyhedron dome cells.
-
-   Subdivide an icosahedron, take its DUAL — every vertex becomes a face.
-   Degree-6 vertices yield hexagons; the 12 original icosahedron vertices
-   yield pentagons. Upper hemisphere only.
-
-   detail=3 → ~150–180 cells in the upper hemisphere.
-   ───────────────────────────────────────────── */
-
 export interface DomeCell {
   index: number;
   /** centroid on the sphere surface */
@@ -35,7 +24,7 @@ export interface DonorData {
 }
 
 export const DOME_RADIUS = 4.5;
-const SUBDIVISION = 3;
+const SUBDIVISION = 5;
 
 export type DomeViewport = "desktop" | "tablet" | "mobile";
 
