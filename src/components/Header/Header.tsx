@@ -11,7 +11,7 @@ export const Header = async () => {
     <header className="z-50 flex flex-shrink-0 flex-col gap-2 border-b border-border/60 bg-bg/96 px-4 py-3 backdrop-blur-md lg:flex-row lg:items-center lg:gap-6 lg:px-6 lg:py-4">
       <div className="flex flex-shrink-0 items-center gap-3">
         <Image
-          src="/assets/LogoMark.svg"
+          src="/assets/Logo.svg"
           alt={t("header.title")}
           width={80}
           height={80}
