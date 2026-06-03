@@ -14,10 +14,23 @@ export async function GET(req: NextRequest) {
 
   const fromDate = fromParam
     ? new Date(fromParam)
-    : (() => { const d = new Date(); d.setDate(d.getDate() - (days - 1)); d.setHours(0, 0, 0, 0); return d; })();
+    : (() => {
+        const d = new Date();
+        d.setDate(d.getDate() - (days - 1));
+        d.setHours(0, 0, 0, 0);
+        return d;
+      })();
   const toDate = toParam
-    ? (() => { const d = new Date(toParam); d.setHours(23, 59, 59, 999); return d; })()
-    : (() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; })();
+    ? (() => {
+        const d = new Date(toParam);
+        d.setHours(23, 59, 59, 999);
+        return d;
+      })()
+    : (() => {
+        const d = new Date();
+        d.setHours(23, 59, 59, 999);
+        return d;
+      })();
 
   try {
     const [donations, coveredAreaAgg, settings] = await Promise.all([
@@ -31,22 +44,37 @@ export async function GET(req: NextRequest) {
         _sum: { squareM2: true },
       }),
       prisma.setting.findMany({
-        where: { key: { in: ["total_goal_uah", "total_area_m2", "collected_uah"] } },
+        where: {
+          key: { in: ["total_goal_uah", "total_area_m2", "collected_uah"] },
+        },
       }),
     ]);
+
+    // Local-date key (YYYY-MM-DD) — uses server local TZ instead of UTC,
+    // otherwise late-evening donations (Kyiv UTC+3) get bucketed into next day
+    // and "today" gets dropped from the range.
+    const localDateKey = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
 
     // Fill every day in range with 0 by default
     const dayMap = new Map<string, { amount: number; count: number }>();
     const cursor = new Date(fromDate);
     cursor.setHours(0, 0, 0, 0);
     while (cursor <= toDate) {
-      dayMap.set(cursor.toISOString().slice(0, 10), { amount: 0, count: 0 });
+      dayMap.set(localDateKey(cursor), { amount: 0, count: 0 });
       cursor.setDate(cursor.getDate() + 1);
     }
     for (const d of donations) {
-      const key = d.createdAt.toISOString().slice(0, 10);
+      const key = localDateKey(d.createdAt);
       const entry = dayMap.get(key);
-      if (entry) { entry.amount += d.amount; entry.count += 1; }
+      if (entry) {
+        entry.amount += d.amount;
+        entry.count += 1;
+      }
     }
 
     const totalDays = dayMap.size;
@@ -60,13 +88,17 @@ export async function GET(req: NextRequest) {
       count: v.count,
     }));
 
-    const settingsMap = Object.fromEntries(settings.map((s) => [s.key, s.value]));
+    const settingsMap = Object.fromEntries(
+      settings.map((s) => [s.key, s.value]),
+    );
     const totalAreaM2 = parseFloat(settingsMap.total_area_m2 ?? "0");
     const totalGoalUah = parseInt(settingsMap.total_goal_uah ?? "0");
     const collectedUah = parseInt(settingsMap.collected_uah ?? "0");
     const coveredM2 = coveredAreaAgg._sum.squareM2 ?? 0;
-    const coveragePercent = totalAreaM2 > 0 ? Math.min(100, (coveredM2 / totalAreaM2) * 100) : 0;
-    const goalPercent = totalGoalUah > 0 ? Math.min(100, (collectedUah / totalGoalUah) * 100) : 0;
+    const coveragePercent =
+      totalAreaM2 > 0 ? Math.min(100, (coveredM2 / totalAreaM2) * 100) : 0;
+    const goalPercent =
+      totalGoalUah > 0 ? Math.min(100, (collectedUah / totalGoalUah) * 100) : 0;
 
     return NextResponse.json({
       dailyDonations,

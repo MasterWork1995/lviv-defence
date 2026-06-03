@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("q")?.trim() ?? "";
 
   const where: Record<string, unknown> = {};
-  if (status && ["pending", "paid", "cancelled"].includes(status)) where.status = status;
+  if (status && ["pending", "paid", "cancelled"].includes(status))
+    where.status = status;
   if (hidden === "true") where.isHidden = true;
   if (hidden === "false") where.isHidden = false;
   if (search) where.name = { contains: search, mode: "insensitive" };
@@ -35,7 +36,12 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       donations,
-      pagination: { page, pageSize: PAGE_SIZE, total, totalPages: Math.ceil(total / PAGE_SIZE) },
+      pagination: {
+        page,
+        pageSize: PAGE_SIZE,
+        total,
+        totalPages: Math.ceil(total / PAGE_SIZE),
+      },
     });
   } catch {
     return dbError();
@@ -58,7 +64,10 @@ export async function POST(req: NextRequest) {
     const { m2PerUah } = await getSettings();
 
     const existing = await prisma.donation.findFirst({
-      where: { name: { equals: trimmedName, mode: "insensitive" }, status: "paid" },
+      where: {
+        name: { equals: trimmedName, mode: "insensitive" },
+        status: "paid",
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -89,7 +98,10 @@ export async function POST(req: NextRequest) {
     await prisma.setting.upsert({
       where: { key: "collected_uah" },
       update: { value: String(totalPaid._sum.amount ?? 0) },
-      create: { key: "collected_uah", value: String(totalPaid._sum.amount ?? 0) },
+      create: {
+        key: "collected_uah",
+        value: String(totalPaid._sum.amount ?? 0),
+      },
     });
 
     return NextResponse.json(donation, { status: existing ? 200 : 201 });

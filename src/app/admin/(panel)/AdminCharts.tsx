@@ -56,7 +56,6 @@ function fmtUah(n: number) {
 
 function fmtM2(m2: number) {
   if (m2 >= 1_000_000) return `${(m2 / 1_000_000).toFixed(2)} км²`;
-  if (m2 >= 1_000) return `${(m2 / 1_000).toFixed(1)} тис. м²`;
   return `${m2.toFixed(1)} м²`;
 }
 
@@ -163,7 +162,11 @@ function CustomTooltip({ active, payload, label }: any) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function AdminCharts() {
+export default function AdminCharts({
+  refreshKey = 0,
+}: {
+  refreshKey?: number;
+}) {
   const [period, setPeriod] = useState<PeriodId>("14");
   const [customFrom, setCustomFrom] = useState(
     toIsoDate(
@@ -193,7 +196,7 @@ export default function AdminCharts() {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, refreshKey]);
 
   const hasActivity = data?.dailyDonations.some((d) => d.amount > 0);
 

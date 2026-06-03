@@ -7,7 +7,11 @@ import { apiError, dbError } from "@/lib/api-error";
 const SUCCESS_STATUSES = new Set(["success"]);
 const CANCEL_STATUSES = new Set(["failure", "reversed", "error"]);
 
-function verifySignature(data: string, signature: string, privateKey: string): boolean {
+function verifySignature(
+  data: string,
+  signature: string,
+  privateKey: string,
+): boolean {
   const expected = createHash("sha1")
     .update(privateKey + data + privateKey)
     .digest("base64");
@@ -35,7 +39,9 @@ export async function POST(req: NextRequest) {
 
   let payload: Record<string, unknown>;
   try {
-    payload = JSON.parse(Buffer.from(data, "base64").toString("utf-8")) as Record<string, unknown>;
+    payload = JSON.parse(
+      Buffer.from(data, "base64").toString("utf-8"),
+    ) as Record<string, unknown>;
   } catch {
     return apiError("Invalid payload.", 400, "INVALID_JSON");
   }
@@ -62,19 +68,30 @@ export async function POST(req: NextRequest) {
     if (SUCCESS_STATUSES.has(status)) {
       await prisma.$transaction(async (tx) => {
         const existing = await tx.donation.findFirst({
-          where: { name: { equals: donation.name, mode: "insensitive" }, status: "paid" },
+          where: {
+            name: { equals: donation.name, mode: "insensitive" },
+            status: "paid",
+          },
           orderBy: { createdAt: "asc" },
         });
         if (existing) {
           await tx.donation.update({
             where: { id: existing.id },
-            data: { amount: existing.amount + donation.amount, squareM2: existing.squareM2 + donation.squareM2 },
+            data: {
+              amount: existing.amount + donation.amount,
+              squareM2: existing.squareM2 + donation.squareM2,
+            },
           });
           await tx.donation.delete({ where: { id: donation.id } });
         } else {
-          await tx.donation.update({ where: { id: donation.id }, data: { status: "paid" } });
+          await tx.donation.update({
+            where: { id: donation.id },
+            data: { status: "paid" },
+          });
         }
-        const setting = await tx.setting.findUnique({ where: { key: "collected_uah" } });
+        const setting = await tx.setting.findUnique({
+          where: { key: "collected_uah" },
+        });
         const current = parseInt(setting?.value ?? "0", 10);
         await tx.setting.upsert({
           where: { key: "collected_uah" },
@@ -86,7 +103,10 @@ export async function POST(req: NextRequest) {
       revalidatePath("/api/donations");
       revalidatePath("/");
     } else if (CANCEL_STATUSES.has(status)) {
-      await prisma.donation.update({ where: { id: donation.id }, data: { status: "cancelled" } });
+      await prisma.donation.update({
+        where: { id: donation.id },
+        data: { status: "cancelled" },
+      });
     }
   } catch {
     return dbError();

@@ -7,8 +7,14 @@ import { apiError, dbError } from "@/lib/api-error";
 const SUCCESS_STATUSES = new Set(["success"]);
 const CANCEL_STATUSES = new Set(["failure", "reversed", "expired"]);
 
-function verifySignature(rawBody: string, signature: string, secret: string): boolean {
-  const expected = createHmac("sha256", secret).update(rawBody).digest("base64");
+function verifySignature(
+  rawBody: string,
+  signature: string,
+  secret: string,
+): boolean {
+  const expected = createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("base64");
   try {
     return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
   } catch {
@@ -18,23 +24,33 @@ function verifySignature(rawBody: string, signature: string, secret: string): bo
 
 export async function POST(req: NextRequest) {
   let rawBody: string;
-  try { rawBody = await req.text(); }
-  catch { return apiError("Failed to read request body.", 400, "INVALID_JSON"); }
+  try {
+    rawBody = await req.text();
+  } catch {
+    return apiError("Failed to read request body.", 400, "INVALID_JSON");
+  }
 
   const secret = process.env.MONOBANK_WEBHOOK_SECRET;
   const signature = req.headers.get("x-sign");
 
   if (secret) {
-    if (!signature) return apiError("Missing X-Sign header.", 401, "UNAUTHORIZED");
+    if (!signature)
+      return apiError("Missing X-Sign header.", 401, "UNAUTHORIZED");
     if (!verifySignature(rawBody, signature, secret))
       return apiError("Invalid signature.", 401, "UNAUTHORIZED");
   }
 
   let payload: unknown;
-  try { payload = JSON.parse(rawBody); }
-  catch { return apiError("Invalid JSON.", 400, "INVALID_JSON"); }
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    return apiError("Invalid JSON.", 400, "INVALID_JSON");
+  }
 
-  const { invoiceId, status } = payload as { invoiceId?: unknown; status?: unknown };
+  const { invoiceId, status } = payload as {
+    invoiceId?: unknown;
+    status?: unknown;
+  };
 
   if (typeof invoiceId !== "string" || !invoiceId)
     return apiError("Missing invoiceId.", 422, "VALIDATION_ERROR");
@@ -55,19 +71,30 @@ export async function POST(req: NextRequest) {
     if (SUCCESS_STATUSES.has(status)) {
       await prisma.$transaction(async (tx) => {
         const existing = await tx.donation.findFirst({
-          where: { name: { equals: donation.name, mode: "insensitive" }, status: "paid" },
+          where: {
+            name: { equals: donation.name, mode: "insensitive" },
+            status: "paid",
+          },
           orderBy: { createdAt: "asc" },
         });
         if (existing) {
           await tx.donation.update({
             where: { id: existing.id },
-            data: { amount: existing.amount + donation.amount, squareM2: existing.squareM2 + donation.squareM2 },
+            data: {
+              amount: existing.amount + donation.amount,
+              squareM2: existing.squareM2 + donation.squareM2,
+            },
           });
           await tx.donation.delete({ where: { id: donation.id } });
         } else {
-          await tx.donation.update({ where: { id: donation.id }, data: { status: "paid" } });
+          await tx.donation.update({
+            where: { id: donation.id },
+            data: { status: "paid" },
+          });
         }
-        const setting = await tx.setting.findUnique({ where: { key: "collected_uah" } });
+        const setting = await tx.setting.findUnique({
+          where: { key: "collected_uah" },
+        });
         const current = parseInt(setting?.value ?? "0", 10);
         await tx.setting.upsert({
           where: { key: "collected_uah" },
@@ -79,7 +106,10 @@ export async function POST(req: NextRequest) {
       revalidatePath("/api/donations");
       revalidatePath("/");
     } else if (CANCEL_STATUSES.has(status)) {
-      await prisma.donation.update({ where: { id: donation.id }, data: { status: "cancelled" } });
+      await prisma.donation.update({
+        where: { id: donation.id },
+        data: { status: "cancelled" },
+      });
     }
   } catch {
     return dbError();

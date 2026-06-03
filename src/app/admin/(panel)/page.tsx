@@ -63,6 +63,11 @@ function fmtUah(n: number) {
   }).format(n);
 }
 
+function fmtM2(m2: number) {
+  if (m2 >= 1_000_000) return `${(m2 / 1_000_000).toFixed(2)} км²`;
+  return `${m2.toFixed(2)} м²`;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   paid: "var(--color-success)",
   pending: "var(--color-warning)",
@@ -86,6 +91,8 @@ export default function AdminDashboardPage() {
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [chartsKey, setChartsKey] = useState(0);
+  const refreshCharts = useCallback(() => setChartsKey((k) => k + 1), []);
 
   const loadStats = useCallback(() => {
     adminFetch("/api/admin/stats")
@@ -125,6 +132,7 @@ export default function AdminDashboardPage() {
     });
     loadDonations();
     loadStats();
+    refreshCharts();
   }
 
   async function changeStatus(id: string, status: string) {
@@ -135,6 +143,7 @@ export default function AdminDashboardPage() {
     });
     loadDonations();
     loadStats();
+    refreshCharts();
   }
 
   async function confirmDelete() {
@@ -142,6 +151,8 @@ export default function AdminDashboardPage() {
     await adminFetch(`/api/admin/donations/${deleteId}`, { method: "DELETE" });
     setDeleteId(null);
     loadDonations();
+    loadStats();
+    refreshCharts();
   }
 
   return (
@@ -179,7 +190,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Charts */}
-      <AdminCharts />
+      <AdminCharts refreshKey={chartsKey} />
 
       {/* Header + filters */}
       <div className="flex items-center justify-between mb-4">
@@ -357,7 +368,7 @@ export default function AdminDashboardPage() {
                     className="px-4 py-3 whitespace-nowrap"
                     style={{ color: "var(--color-text-dim)" }}
                   >
-                    {d.squareM2.toFixed(2)} м²
+                    {fmtM2(d.squareM2)}
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -464,6 +475,7 @@ export default function AdminDashboardPage() {
           onSaved={() => {
             loadDonations();
             loadStats();
+            refreshCharts();
           }}
         />
       )}
